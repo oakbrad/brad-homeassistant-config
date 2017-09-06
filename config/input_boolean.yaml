@@ -1,0 +1,59 @@
+# Alarm
+alarm_override:
+  name: Alarm Override
+  initial: off
+  icon: mdi:cancel
+
+# PRESENCE
+vacation_mode:
+  name: Vacation Mode
+  initial: off
+  icon: mdi:airplane
+guest_mode:
+  name: Guest Mode
+  initial: off
+  icon: mdi:account-multiple
+alarmworkday:
+  name: Work Days Only
+  initial: off
+  icon: mdi:calendar-check
+
+#
+# Foor Plan UI buttons for toggling Scenes
+# Automations in system.yaml
+#
+ui_livingroom:
+  name: Living Room Button
+  initial: off
+ui_diningroom:
+  name: Dining Room Button
+  initial: off
+ui_kitchen:
+  name: Kitchen Button
+  initial: off
+
+# SabNZBD
+sabnzbd_turtle_mode:
+  name: SabNZBD Turtle Mode
+  initial: off
+
+
+#
+# Automation Conditions
+#
+nightlight_override:
+  name: Nightlight Override
+  initial: off
+  icon: mdi:flashlight
+nightlight_kitchen:
+  name: Kitchen Nightlight
+  initial: off
+  icon: mdi:flashlight
+nightlight_livingroom:
+  name: Kitchen Nightlight
+  initial: off
+  icon: mdi:flashlight
+nightlight_bedroom:
+  name: Bedroom Nightlight
+  initial: off
+  icon: mdi:flashlight

@@ -1,0 +1,26 @@
+# use Amazon Echo for TTS
+# Custom Component:
+# https://github.com/pkozul/ha-tts-bluetooth-speaker
+- platform: tts_bluetooth_speaker
+  address: AC:63:BE:1D:BA:EF
+  volume: 0.5
+  cache_dir: /tmp/tts
+  #pre_silence_duration: 1
+  #post_silence_duration: 1
+
+- platform: mpd
+  name: pi
+  location: pi
+  host: 192.168.0.6
+  port: 6600
+
+#  - platform: volumio
+#    host: stereo.local
+#    port: 3000
+
+- platform: vlc
+  name: vlc_tts
+
+- platform: plex
+
+- platform: roku

@@ -1,0 +1,111 @@
+#
+# Prolific use of custom-ui component
+# https://github.com/andrey-git/home-assistant-custom-ui
+#
+
+    "*.*":
+      custom_ui_state_card: custom-ui
+    group.alarmbadge:
+      state_card_mode: badges
+      badges_list:
+        - alarm_control_panel.loft_alarm
+        - group.tracked_users
+        - input_boolean.guest_mode
+        - input_boolean.vacation_mode
+    group.bradsdevicesbadges:
+      state_card_mode: badges
+      badges_list:
+        - device_tracker.brad
+        - device_tracker.brad_ios
+        - device_tracker.brad_owntracks
+        - device_tracker.brad_ping
+    group.pibadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.ram_use
+        - sensor.cpu_use
+        - sensor.disk_use_
+        - sensor.disk_free_
+    group.devicebadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.synology_online
+        - sensor.bradlaptop_online
+        - sensor.ikeatradfri_online
+        - sensor.espmilight_online
+        - sensor.windowcam_online
+        - sensor.frontdoorcam_online
+        - sensor.laserprinter_online
+    group.openingsbadges:
+      state_card_mode: badges
+    group.transmissionbadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.transmission_down_speed_kbps
+        - sensor.transmission_up_speed_kbps
+    group.traveltimesbadges:
+      state_card_mode: badges
+    group.sabnzbdbadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.sabnzbd_speed
+        - sensor.sabnzbd_left
+        - sensor.sabnzbd_queue
+    group.environmentbadges:
+      state_card_mode: badges
+    group.motionbadges:
+      state_card_mode: badges
+      badges_list:
+        - binary_sensor.entry_motion_meta
+        - binary_sensor.closet_motion
+        - binary_sensor.bathroom_motion
+        - binary_sensor.kitchen_motion_meta
+        - binary_sensor.dining_motion_meta
+        - binary_sensor.office_motion
+        - binary_sensor.livingroom_motion_meta
+    group.todaybadges:
+      state_card_mode: badges
+      badges_list:
+        - sun.sun
+        - sensor.solar_angle
+        - sensor.moon
+        - sensor.sunset_time
+        - sensor.sunrise_time
+    group.weatherbadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.yr_symbol
+        - sensor.dark_sky_temperature
+        - sensor.dark_sky_daily_high_temperature
+        - sensor.dark_sky_daily_low_temperature
+    group.weatherconditionsbadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.dark_sky_precip_probability
+        - sensor.dark_sky_cloud_coverage
+        - sensor.friendly_wind_direction
+        - sensor.dark_sky_wind_speed
+    group.weatherforecastbadges:
+      state_card_mode: badges
+      badges_list:
+        - sensor.dark_sky_daily_high_temperature_1
+        - sensor.dark_sky_daily_low_temperature_1
+        - sensor.dark_sky_precip_probability_1
+        - sensor.dark_sky_cloud_coverage_1
+        - sensor.friendly_wind_direction_forecast
+    light.*:
+      custom_ui_state_card: custom-ui
+      state_card_mode: single-line
+      hide_control: true
+      stretch_slider: true
+      slider_theme:
+        min: 0
+        max: 255
+        off_when_min: true
+    plant.*:
+      custom_ui_state_card: custom-ui
+      show_last_changed: true
+      extra_badge:
+        attribute: moisture
+        unit: "%"
+        blacklist_states: null

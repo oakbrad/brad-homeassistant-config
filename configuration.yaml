@@ -1,0 +1,590 @@
+#
+# BRAD's HA CONFIG
+# LIVING IN THE FUTURE
+#
+
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: 7
+  unit_system: imperial
+  time_zone: America/Los_Angeles
+  customize: !include config/customize.yaml
+  customize_glob: !include config/custom-ui.yaml
+
+recorder:
+#  db_url: !secret db_path
+  purge_days: 5
+#logger:
+#  default: debug
+frontend:
+http:
+  api_password: !secret http_password
+updater:
+history:
+sun:
+wemo:
+
+# Custom UI Panels
+panel_custom:
+  - name: floorplan
+    sidebar_title: Floorplan
+    sidebar_icon: mdi:floor-plan
+    url_path: floorplan
+    config: !include config/floorplan.yaml
+
+#
+# Split configuration into separate files
+#
+device_tracker: !include config/device_tracker.yaml
+zone: !include config/zones.yaml
+scene: !include_dir_merge_list scenes
+script: !include_dir_merge_named scripts
+python_script:
+input_boolean: !include config/input_boolean.yaml
+input_slider: !include config/input_slider.yaml
+sensor: !include config/sensors.yaml
+binary_sensor: !include config/binary_sensors.yaml
+switch: !include config/switches.yaml
+automation: !include_dir_merge_list automation
+logbook: !include config/logbook.yaml
+shell_command: !include config/shell.yaml
+plant: !include config/plants.yaml
+media_player: !include config/media_players.yaml
+mqtt: !include config/mqtt.yaml
+rest_command: !include config/rest.yaml
+variable: !include config/variable.yaml
+#
+# Additional Platforms
+#
+alarm_control_panel:
+  - platform: manual
+    name: Loft Alarm
+    pending_time: 45
+    trigger_time: 120
+camera: !include config/cameras.yaml
+light: !include config/lights.yaml
+ios:
+emulated_hue:
+  listen_port: 8300
+  expose_by_default: false
+tradfri:
+  host: 192.168.0.9
+  api_key: !secret ikea_key
+ifttt:
+  key: !secret ifttt_key
+google:
+  client_id: !secret google_cal_client
+  client_secret: !secret google_cal_secret
+tts:
+  - platform: google
+    cache: true
+    cache_dir: /tmp/tts
+    time_memory: 3600
+  - platform: amazon_polly
+    aws_access_key_id: !secret aws_key
+    aws_secret_access_key: !secret aws_secret_key
+    name: polly
+    # English US Female
+    voice: Salli
+    # English UK Female
+    # voice: Amy
+proximity:
+  home:
+    ignored_zones:
+      - Studio
+      - SF
+    devices:
+      - device_tracker.brad
+    tolerance: 50
+    unit_of_measurement: mi
+#
+# Set up Communication Hardware
+#
+
+# This causes HA to hang :( :(
+#zha:
+#  usb_path: /dev/ttyUSB1
+#  database_path: /home/homeassistant/.homeassistant/zigbee.db
+zwave:
+  usb_path: /dev/ttyUSB0
+  new_entity_ids: true
+  config_path: /usr/local/lib/python3.4/dist-packages/python_openzwave/ozw_config
+  polling_interval: 30000
+  device_config:
+    light.back_overheads:
+      refresh_value: true
+      delay: 5
+      polling_intensity: 1
+    light.front_overheads:
+      refresh_value: true
+      delay: 5
+      polling_intensity: 1
+    switch.bathroom_light:
+      refresh_value: true
+      polling_intensity: 1
+    switch.bathroom_fan:
+      refresh_value: true
+      polling_intensity: 1
+    switch.kitchen_lights:
+      refresh_value: true
+      polling_intensity: 1
+
+###########################
+## ORGANIZE INTO GROUPS  ##
+###########################
+
+group:
+  # REPLACE HOME PAGE
+  default_view:
+    view: yes
+    icon: mdi:home
+    entities:
+      - group.Scenes
+      - group.AlarmClock
+      - group.Alarm
+  Lights:
+    view: yes
+    icon: mdi:flash
+    entities:
+      - group.Bathroom
+      - group.Bedroom
+      - group.Kitchen
+      - group.diningroom
+      - group.LivingRoom
+      - group.Office
+      - group.Overheads
+      - group.Misc
+  # CLIMATE TAB
+  Climate:
+    view: yes
+    icon: mdi:thermometer
+    entities:
+      - camera.sf_radar
+      - camera.east_bay
+      - group.Weather
+      - group.Today
+      - group.Indoors
+  Work:
+    view: yes
+    icon: mdi:worker
+    entities:
+      - group.WorkNextJob
+      - group.WorkNextJobLocation
+      - group.BradTransit
+      - group.EventsCalendar
+      - camera.work_location
+      - camera.work_street_view
+  # MEDIA TAB
+  Media:
+    view: yes
+    icon: mdi:filmstrip
+    entities:
+      - group.Radio
+      - media_player.roku_3__4124cg078650
+      - media_player.vlc_tts
+      - group.Speakers
+      - group.Downloads
+  # MONITORING TAB
+  Cameras:
+    view: yes
+    icon: mdi:eye
+    entities:
+      - group.Bikes
+      - group.Motion
+      - group.Openings
+      - camera.car_location
+      - camera.front_door
+#      - camera.window
+  Information:
+    view: yes
+    icon: mdi:barley
+    entities:
+      - group.Plants
+      - group.Aquarium
+  # SYSTEM TAB
+  System:
+    view: yes
+    icon: mdi:gauge
+    entities:
+      - group.BradsDevices
+      - group.SystemOptions
+      - group.Devices
+      - group.Pi
+  # WALL PANEL
+  WallPanel:
+    view: yes
+    icon: mdi:tablet-android
+    entities:
+      - group.traveltimes
+      - group.TodayWeather
+      - group.Radio
+      - group.Rooms
+
+# TRACKED USERS
+  tracked_users:
+    view: no
+    name: Tracked Users
+    entities:
+      - device_tracker.brad
+      - group.guestdevices
+  guestdevices:
+    view: no
+    name: Guest Devices
+    entities:
+      - device_tracker.jenny_oh_hatfields_iphone
+
+# SMALLER GROUPS FOR ABOVE TABS
+#
+
+# Alarm Alarm
+  Alarm:
+    control: hidden
+    name: Alarm
+    entities:
+      - group.alarmbadge
+      - variable.house_state
+      - script.alarm_disarm
+      - script.alarm_arm_home
+      - input_boolean.alarm_override
+# Alarm Status Badge
+  alarmbadge:
+    entities:
+      - alarm_control_panel.loft_alarm
+      - group.tracked_users
+      - input_boolean.guest_mode
+      - input_boolean.vacation_mode
+# Alarm Clock
+  AlarmClock:
+    control: hidden
+    name: Alarm Clock
+    entities:
+      - automation.alarm_clock
+      - sensor.alarm_time
+      - input_slider.alarmhour
+      - input_slider.alarmminutes
+      - input_boolean.alarmworkday
+      - sensor.coffeemaker
+  Bathroom:
+    name: Bathroom
+    entities:
+      - switch.bathroom_light
+      - switch.bathroom_fan
+  BradsDevices:
+    name: "Brad"
+    entities:
+      - group.bradsdevicesbadges
+      - sensor.battery_iphone
+  bradsdevicesbadges:
+    entities:
+      - device_tracker.brad
+      - device_tracker.brad_ios
+      - device_tracker.brad_owntracks
+      - device_tracker.brad_ping
+      - device_tracker.brad_router
+  Devices:
+    name: Devices
+    entities:
+      - group.devicebadges
+      - sensor.synology_storage_free
+  devicebadges:
+    entities:
+      - sensor.synology_online
+      - sensor.bradlaptop_online
+      - sensor.ikeatradfri_online
+      - sensor.espmilight_online
+      - sensor.windowcam_online
+      - sensor.frontdoorcam_online
+      - sensor.laserprinter_online
+  Indoors:
+    name: Indoor Air Quality
+    entities:
+      - group.environmentbadges
+  environmentbadges:
+    entities:
+      - sensor.indoor_mean_temp
+      - sensor.indoor_mean_humidity
+      - sensor.air_pressure
+      - sensor.kitchen_smoke
+      - sensor.carbon_monoxide
+  Overheads:
+    entities:
+      - light.front_overheads
+      - light.back_overheads
+  Plants:
+    entities:
+      - sensor.plant_problems
+      - script.tts_plant_info
+      - plant.window_container
+      - plant.rubber_plant
+      - plant.giant_pothos
+      - plant.giant_philodendron
+      - plant.palm
+      - plant.projector_pothos
+      - plant.hanging_red_pothos
+      - plant.hanging_spider_plant
+      - plant.kitchen_pothos
+      - plant.small_philodendron
+      - plant.window_spider_plant
+  Bedroom:
+    entities:
+    - light.entry
+    - light.closet
+    - light.bedroom
+    - switch.bedroom_fan
+  Bikes:
+      entities:
+        - device_tracker.beacon_bike_saga
+        - device_tracker.beacon_bike_xo1
+  Kitchen:
+    control: hidden
+    entities:
+    - switch.kitchen_lights
+    - switch.edison_pendants
+    - switch.string_lights
+    - light.stove
+    - light.fridge
+    - switch.sink
+    - switch.coffeemaker
+  kitchen_zone:
+    - switch.edison_pendants
+    - light.stove
+    - light.fridge
+    - switch.sink
+  livingroom:
+    name: Living Room
+    entities:
+    - light.back_overheads
+    - light.globes
+    - light.floor_lamp
+  diningroom:
+    - light.dining_floor_lamp
+    - switch.string_lights
+  Office:
+   entities:
+    - switch.office
+    - light.office_pendant
+    - switch.work_lamp
+  Grocery_Zone:
+    name: Near Grocery
+    entities:
+    - zone.whole_foods
+    - zone.sprouts_market
+    - zone.grocery_outlet
+    - zone.lucky_grocery
+  Rooms:
+    name: Lights
+    entities:
+    - group.Overheads
+    - group.Bedroom
+    - switch.kitchen_lights
+    - group.LivingRoom
+    - group.Office
+    - script.everything_off
+  Scenes:
+    control: hidden
+    entities:
+    - scene.day_dim_lights
+    - scene.evening_bright_lights
+    - scene.night_dim_lights
+    - script.everything_off
+    - scene.all_lights_on
+    - script.goodnight
+  Today:
+    entities:
+    - group.todaybadges
+    - sensor.friendly_date
+    - sensor.dark_sky_hourly_summary
+  # Put a copy in default_view for commute
+  TodayDefault:
+    name: Today
+    entities:
+    - group.todaybadges
+    - sensor.friendly_date
+    - sensor.dark_sky_hourly_summary
+  todaybadges:
+    entities:
+    - sun.sun
+    - sensor.solar_angle
+    - sensor.sunrise_time
+    - sensor.sunset_time
+    - sensor.moon
+  Speakers:
+    entities:
+    - switch.mpd_pi
+    - input_slider.radiovolume
+    - sensor.nowplaying_pi
+    - switch.volumio
+    - input_slider.stereovolume
+    - sensor.nowplaying_volumio
+  SystemOptions:
+    name: Home Options
+    entities:
+#    - group.tracked_users
+    - input_boolean.are_any_lights_on
+    - input_boolean.alarm_override
+    - input_boolean.nightlight_override
+    - input_boolean.vacation_mode
+    - input_boolean.guest_mode
+    - switch.flux
+  Motion:
+    entities:
+    - variable.last_motion
+    - group.motionbadges
+  motionbadges:
+    entities:
+    - binary_sensor.entry_motion_meta
+    - binary_sensor.closet_motion
+    - binary_sensor.bathroom_motion
+    - binary_sensor.kitchen_motion_meta
+    - binary_sensor.dining_motion_meta
+    - binary_sensor.office_motion
+    - binary_sensor.livingroom_motion_meta
+  Openings:
+    entities:
+    - group.openingsbadges
+  openingsbadges:
+    entities:
+    - binary_sensor.front_door
+    - binary_sensor.crawl_space_door
+    - binary_sensor.left_window
+  Aquarium:
+    entities:
+    - switch.aquarium
+    - binary_sensor.left_window
+    - sensor.window_air_temp
+    - sensor.water_temperature
+  Misc:
+    - switch.aquarium
+    - switch.grow_light
+    - light.crawl_space
+  Pi:
+    name: HomeAssistant Pi
+    control: hidden
+    entities:
+      - group.pibadges
+      - sensor.since_last_boot
+      - script.restart_ha
+      - switch.pi_shutdown
+      - switch.pi_reboot
+  pibadges:
+    entities:
+      - sensor.ram_use
+      - sensor.cpu_use
+      - sensor.disk_use_
+      - sensor.disk_free_
+  Radio:
+    name: Radio
+    control: hidden
+    entities:
+#      - sensor.nowplaying_pi
+      - input_slider.radiovolume
+      - switch.mpd_pi
+      - script.tts_plant_info
+#      - switch.radio_kalx
+#      - switch.radio_jazz
+#      - switch.radio_metal
+#      - switch.radio_kzsc
+  Weather:
+    entities:
+      - group.weatherbadges
+      - group.weatherconditionsbadges
+      - sensor.dark_sky_daily_summary
+      - group.weatherforecastbadges
+  TodayWeather:
+    name: "Today's Weather"
+    entities:
+      - group.weatherbadges
+      - group.weatherconditionsbadges
+#      - sensor.dark_sky_daily_summary
+  weatherbadges:
+    entities:
+      - sensor.yr_symbol
+      - sensor.dark_sky_temperature
+      - sensor.dark_sky_daily_high_temperature
+      - sensor.dark_sky_daily_low_temperature
+  weatherconditionsbadges:
+    entities:
+      - sensor.dark_sky_precip_probability
+      - sensor.dark_sky_cloud_coverage
+      - sensor.friendly_wind_direction
+      - sensor.dark_sky_wind_speed
+  weatherforecastbadges:
+    entities:
+      - sensor.dark_sky_daily_high_temperature_1
+      - sensor.dark_sky_daily_low_temperature_1
+      - sensor.dark_sky_precip_probability_1
+      - sensor.dark_sky_cloud_coverage_1
+      - sensor.friendly_wind_direction_forecast
+  TravelTimes:
+    name: Travel Times
+    entities:
+      - group.traveltimesbadges
+  traveltimesbadges:
+    entities:
+      - sensor.home_to_sf
+      - sensor.home_to_16th_mission_bart
+      - sensor.home_to_richmond_bart
+      - sensor.ferry_to_sf
+      - sensor.ferry_to_sf_arrival
+  Downloads:
+    entities:
+      - sensor.transmission_status
+      - switch.transmission_turtle_mode
+      - group.transmissionbadges
+      - sensor.transmission_status
+      - sensor.sabnzbd_status
+      - input_boolean.sabnzbd_turtle_mode
+      - group.sabnzbdbadges
+  transmissionbadges:
+    entities:
+      - sensor.transmission_down_speed_kbps
+      - sensor.transmission_up_speed_kbps
+  sabnzbdbadges:
+    entities:
+      - sensor.sabnzbd_speed
+      - sensor.sabnzbd_left
+      - sensor.sabnzbd_queue
+  WorkNextJob:
+    name: Next Job
+    entities:
+      - sensor.cal_work_job
+      - sensor.cal_work_date
+      - sensor.cal_work_call_time
+      - sensor.cal_work_notes
+      - sensor.cal_work_today
+  WorkNextJobLocation:
+    name: Job Location
+    entities:
+      - sensor.cal_work_location
+      - sensor.transit_to_next_job
+      - sensor.cal_work_leave_time_transit
+      - sensor.driving_to_next_job
+      - sensor.cal_work_leave_time_driving
+      - sensor.bike_to_next_job
+      - sensor.cal_work_bike_distance
+      - sensor.cal_work_leave_time_bike
+  EventsCalendar:
+    name: Next Event
+    entities:
+      - sensor.cal_fb_event
+      - sensor.cal_fb_today
+      - sensor.cal_fb_time
+      - sensor.cal_fb_location
+      - sensor.cal_fb_url
+#      - sensor.cal_fb_description
+      - sensor.transit_to_next_event
+      - sensor.cal_fb_leave_time_transit
+      - sensor.driving_to_next_event
+      - sensor.cal_fb_leave_time_driving
+      - sensor.bike_to_next_event
+      - sensor.cal_fb_bike_distance
+      - sensor.cal_fb_leave_time_bike
+  BradTransit:
+    name: Transit
+    entities:
+      - device_tracker.brad
+      - proximity.home
+      - variable.transit_mode
+      - variable.transit_bike

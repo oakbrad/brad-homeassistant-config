@@ -1,0 +1,140 @@
+#
+# SWITCHES!!!!
+#
+- platform: flux
+  lights:
+    - light.tradfri_bulb_e12_ws_opal_400lm_2
+    - light.tradfri_bulb_e12_ws_opal_400lm
+  name: Flux
+  start_time: '5:30'
+  stop_time: '10:30'
+  disable_brightness_adjust: True
+  mode: mired
+
+# SONOFFs Running Sonoff-HomeAssistant
+- platform: mqtt
+  name: "Bedroom Fan"
+  state_topic: "sonoff/bedroom/fan/stat"
+  command_topic: "sonoff/bedroom/fan"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true
+- platform: mqtt
+  name: "String Lights"
+  state_topic: "sonoff/kitchen/string_lights/stat"
+  command_topic: "sonoff/kitchen/string_lights"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true
+- platform: mqtt
+  name: "Work Lamp"
+  state_topic: "sonoff/office/work_lamp/stat"
+  command_topic: "sonoff/office/work_lamp"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true
+- platform: mqtt
+  name: "Edison Pendants"
+  state_topic: "sonoff/kitchen/edison_pendants/stat"
+  command_topic: "sonoff/kitchen/edison_pendants"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true
+- platform: mqtt
+  name: "Sink"
+  state_topic: "sonoff/extra_lamp/stat"
+  command_topic: "sonoff/extra_lamp"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+  retain: true
+#
+# Switches for MPD
+#
+- platform: template
+  switches:
+    mpd_pi:
+      friendly_name: Pi Speaker
+      value_template: "{{ is_state('media_player.pi', 'playing') }}"
+      turn_on:
+        service: homeassistant.turn_on
+        entity_id: media_player.pi
+      turn_off:
+        service: homeassistant.turn_off
+        entity_id: media_player.pi
+#
+# Switch for Volumio
+- platform: template
+  switches:
+    volumio:
+      friendly_name: Stereo Speaker
+      value_template: "{{ is_state('media_player.volumio', 'playing') }}"
+      turn_on:
+        service: homeassistant.turn_on
+        entity_id: media_player.volumio
+      turn_off:
+        service: homeassistant.turn_off
+        entity_id: media_player.volumio
+
+#
+# Switches for Radio Stations
+#
+- platform: command_line
+  switches:
+    radio_npr:
+      command_on: "/usr/bin/mpc play 1"
+      command_off: "/usr/bin/mpc stop"
+      command_state: "/home/homeassistant/shell/radio_nprstate.sh"
+      friendly_name: NPR 
+    radio_kalx:
+      command_on: "/usr/bin/mpc play 2"
+      command_off: "/usr/bin/mpc stop"
+      command_state: "/home/homeassistant/shell/radio_kalxstate.sh"
+      friendly_name: KALX
+    radio_jazz:
+      command_on: "/usr/bin/mpc play 3"
+      command_off: "/usr/bin/mpc stop"
+      command_state: "/home/homeassistant/shell/radio_jazzstate.sh"
+      friendly_name: KCSM
+    radio_metal:
+      command_on: "/usr/bin/mpc play 4"
+      command_off: "/usr/bin/mpc stop"
+      command_state: "/home/homeassistant/shell/radio_metalstate.sh"
+      friendly_name: WSOU
+    radio_kzsc:
+      command_on: "/usr/bin/mpc play 5"
+      command_off: "/usr/bin/mpc stop"
+      command_state: "/home/homeassistant/shell/radio_kzscstate.sh"
+      friendly_name: KZSC
+# SWITCH FOR STEREO
+    stereo:
+      command_on: "/usr/bin/mpc -h 192.168.0.7 toggle"
+      command_off: "/usr/bin/mpc -h 192.168.0.7 toggle"
+      command_state: "/home/homeassistant/shell/stereo_state.sh"
+#     value_template: "{{ is_state('media_player.stereo', 'playing') }}"
+      friendly_name: Stereo
+
+#
+# Transmission on/off
+#
+- platform: transmission
+  host: 192.168.0.5
+  username: admin
+  password: admin
+
+#
+# TP-LINK SWITCHES
+#
+- platform: tplink
+  host: 192.168.0.31
+  name: Grow Light
+- platform: tplink
+  host: 192.168.0.32
+  name: Aquarium
+- platform: tplink
+  host: 192.168.0.33
+  name: Office

@@ -1,0 +1,221 @@
+#
+# Things related to keeping the smart home running smoothly
+#
+
+#
+# Turn screensaver off when motion detected
+#
+
+- alias: 'Turn On Fridge Panel Screen on Motion'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_motion_meta
+    to: 'on'
+  # stop it from blinding me at night. Click to open instead.
+  # Only after 4:30A
+  # If after sunset, only if a light is on
+  condition:
+    condition: or
+    conditions:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: sun.sun
+            state: 'below_horizon'
+          - condition: state
+            entity_id: sensor.are_any_lights_on
+            state: 'on'
+      - condition: time
+        after: '04:30:00'
+  action:
+    service: shell_command.fridgepanel_screensaveroff
+
+#
+# Maintain input_booleans for Floorplan UI room states.
+# Turn on/off scene depending on state
+#
+- alias: 'Maintain Living Room UI Boolean On'
+  trigger:
+    platform: state
+    entity_id: group.livingroom
+    to: 'on'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.ui_livingroom
+- alias: 'Maintain Living Room UI Boolean Off'
+  trigger:
+    platform: state
+    entity_id: group.livingroom
+    to: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.ui_livingroom
+- alias: 'Turn On Living Room Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_livingroom
+    to: 'on'
+  condition:
+    condition: state
+    entity_id: group.livingroom
+    state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_on
+- alias: 'Turn Off Living Room Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_livingroom
+    to: 'off'
+  condition:
+    condition: state
+    entity_id: group.livingroom
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_off
+
+
+- alias: 'Maintain Dining Room UI Boolean On'
+  trigger:
+    platform: state
+    entity_id: group.diningroom
+    to: 'on'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.ui_diningroom
+- alias: 'Maintain Dining Room UI Boolean Off'
+  trigger:
+    platform: state
+    entity_id: group.diningroom
+    to: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.ui_diningroom
+- alias: 'Turn On Dining Room Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_diningroom
+    to: 'on'
+  condition:
+    condition: state
+    entity_id: group.diningroom
+    state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.diningroom_on
+- alias: 'Turn Off Dining Room Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_diningroom
+    to: 'off'
+  condition:
+    condition: state
+    entity_id: group.diningroom
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.diningroom_off
+
+
+- alias: 'Maintain Kitchen UI Boolean On'
+  trigger:
+    platform: state
+    entity_id: group.kitchen_zone
+    to: 'on'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.ui_kitchen
+- alias: 'Maintain Kitchen UI Boolean Off'
+  trigger:
+    platform: state
+    entity_id: group.kitchen_zone
+    to: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.ui_kitchen
+- alias: 'Turn On Kitchen Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_kitchen
+    to: 'on'
+  condition:
+    condition: state
+    entity_id: group.kitchen_zone
+    state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.kitchen_on
+- alias: 'Turn Off Kitchen Scene'
+  trigger:
+    platform: state
+    entity_id: input_boolean.ui_kitchen
+    to: 'off'
+  condition:
+    condition: state
+    entity_id: group.kitchen_zone
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.kitchen_off
+
+# Run the are_any_lights_on script every 15s
+# To clean up after scenes - only if home otherwise don't bother
+- alias: 'Clean Up Are Any Lights On'
+  trigger:
+    platform: time
+    seconds: 15
+  condition:
+    condition: state
+    entity_id: group.trackedusers
+    state: 'home'
+  action:
+    service: python_script.are_any_lights_on
+
+# Use Input Boolean to trigger REST command for SAB
+- alias: 'Pause SabNZBD'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.sabnzbd_turtle_mode
+      to: 'on'
+  action:
+    service: rest_command.sabnzbd_pause
+- alias: 'Resume SabNZBD'
+  trigger:
+    platform: state
+    entity_id: input_boolean.sabnzbd_turtle_mode
+    to: 'off'
+  action:
+    service: rest_command.sabnzbd_resume
+
+#
+# DIY motion sensors get stuck sometimes
+# Turn off with HA until I get around to something better
+#
+#
+
+- alias: 'Fix Stuck Kitchen Motion'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kitchen_motion
+      to: 'on'
+      for:
+        seconds: 10
+  action:
+    - service: mqtt.publish
+      data:
+        topic: "KitchenNode/Motion/Switch"
+        payload: 0
+
+- alias: 'Fix Stuck Entry Motion'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entry_motion
+      to: 'on'
+      for:
+        seconds: 10
+  action:
+    - service: mqtt.publish
+      data:
+        topic: "FrontDoorNode/Motion/Switch"
+        payload: 0

@@ -1,0 +1,45 @@
+#
+# Night Time Dim Lights
+#
+- name: Night Dim Lights
+  entities:
+    light.dining_floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 125
+      transition: 8
+    switch.sink: off
+    light.entry:
+      state: off
+      transition: 8
+      rgb_color: [255,255,255]
+    light.stove:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 100
+      transition: 8
+    light.fridge:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 40
+      transition: 8
+    light.floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 80
+      transition: 8
+    light.globes:
+      state: off
+      brightness: 30
+      transition: 8
+    switch.string_lights: off
+    light.office_pendant:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 50
+      transition: 8
+    light.back_overheads: off
+    light.bedroom:
+      state: on
+      brightness: 40
+    light.front_overheads: off

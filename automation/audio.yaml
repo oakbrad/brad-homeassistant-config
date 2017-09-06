@@ -1,0 +1,38 @@
+#
+# MPD AND AUDIO RELATED
+#
+#
+
+#
+# Adjust Pi Volume from GUI
+#
+- alias: 'Adjust Radio Volume'
+  trigger:
+    platform: state
+    entity_id: input_slider.radiovolume
+  action:
+    - service: shell_command.changeradiovolume
+#
+# Adjust Living Room Speaker Volume from GUI
+#
+- alias: 'Adjust Stereo Volume'
+  trigger:
+    platform: state
+    entity_id: input_slider.stereovolume
+  action:
+    - service: media_player.volume_set
+      data_template:
+        entity_id: media_player.volumio
+        volume_level: '{{ trigger.to_state.state }}'
+
+#
+# Make it bidirectional to change input_slider if Volumio changes
+- alias: 'Get Stereo Volume'
+  trigger: 
+    platform: state
+    entity_id: media_player.volumio
+  action:
+    service: input_slider.select_value
+    data_template:
+      entity_id: input_slider.stereovolume
+      value: '{{ trigger.to_state.attributes.volume_level }}'

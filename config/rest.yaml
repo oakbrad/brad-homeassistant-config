@@ -1,0 +1,8 @@
+sabnzbd_pause:
+  url: http://192.168.0.5:8080/sabnzbd/api?apikey=d79b4a1a341893ea1236e4a53c971c4c&output=json&mode=pause
+#
+sabnzbd_resume:
+  url: http://192.168.0.5:8080/sabnzbd/api?apikey=d79b4a1a341893ea1236e4a53c971c4c&output=json&mode=resume
+#
+#sabnzbd_speedlimit:
+  

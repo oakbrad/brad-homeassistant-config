@@ -1,0 +1,30 @@
+#
+# Night Light
+#
+- name: Night Light
+  entities:
+    light.entry:
+      state: on
+      rgb_color: [255,0,0]
+      brightness: 75
+    switch.bathroom_light: off
+    light.floor_lamp: off
+    light.globes: off
+    switch.office: off
+    light.stove: off
+    light.closet: off
+    light.fridge:
+      state: on
+      rgb_color: [255,0,0]
+      brightness: 50
+    switch.string_lights: off
+    light.bedroom: off
+    light.office_pendant:
+      state: on
+      rgb_color: [255,0,0]
+      brightness: 60
+    switch.edison_pendants: off
+    light.dining_floor_lamp:
+      state: on
+      rgb_color: [255,0,0]
+      brightness: 110

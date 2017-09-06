@@ -1,0 +1,38 @@
+# My cameras
+- platform: mjpeg
+  name: "Front Door"
+  username: frontdoor
+  password: !secret camera_frontdoor_pass
+  mjpeg_url: http://192.168.0.50/video.mjpg
+
+# Webcams
+- platform: generic
+  name: "SF Radar"
+  still_image_url: https://radblast.wunderground.com/cgi-bin/radar/WUNIDS_map?station=MUX&brand=wui&num=1&delay=15&type=N0R&frame=0&scale=1.000&noclutter=0&showstorms=0&mapx=400&mapy=240&centerx=400&centery=240&transx=0&transy=0&showlabels=1&severe=0&rainsnow=0&lightning=0&smooth=1&rand=24789409&lat=0&lon=0&label=you
+- platform: generic
+  name: East Bay
+  still_image_url: http://static.lawrencehallofscience.org/scienceview/scienceview.berkeley.edu/html/view/view_assets/images/newview.jpg
+
+# Beacon Tracking
+- platform: generic
+  name: "Car Location"
+  still_image_url: https://maps.googleapis.com/maps/api/staticmap?center={{ states.device_tracker.beacon_element.attributes.latitude }},{{ states.device_tracker.beacon_element.attributes.longitude }}&zoom=17&size=500x500&maptype=roadmap&markers=color:blue%7Clabel:P%7C{{ states.device_tracker.beacon_element.attributes.latitude }},{{ states.device_tracker.beacon_element.attributes.longitude }}
+  limit_refetch_to_url_change: true
+- platform: generic
+  name: "XO-1 Location"
+  still_image_url: https://maps.googleapis.com/maps/api/staticmap?center={{ states.device_tracker.beacon_bike_xo1.attributes.latitude }},{{ states.device_tracker.beacon_bike_xo1.attributes.longitude }}&zoom=17&size=500x500&maptype=roadmap&markers=color:blue%7Clabel:P%7C{{ states.device_tracker.beacon_bike_xo1.attributes.latitude }},{{ states.device_tracker.beacon_bike_xo1.attributes.longitude }}
+  limit_refetch_to_url_change: true
+- platform: generic
+  name: "Saga Location"
+  still_image_url: https://maps.googleapis.com/maps/api/staticmap?center={{ states.device_tracker.beacon_bike_saga.attributes.latitude }},{{ states.device_tracker.beacon_bike_saga.attributes.longitude }}&zoom=17&size=500x500&maptype=roadmap&markers=color:blue%7Clabel:P%7C{{ states.device_tracker.beacon_bike_saga.attributes.latitude }},{{ states.device_tracker.beacon_bike_saga.attributes.longitude }}
+  limit_refetch_to_url_change: true
+
+# Work Commute
+- platform: generic
+  name: Work Location
+  still_image_url: https://maps.googleapis.com/maps/api/staticmap?center={{states.calendar.work.attributes.location}}&zoom=16&size=600x600&maptype=roadmap&markers=color:blue%7C{{states.calendar.work.attributes.location}}
+  limit_refetch_to_url_change: true
+- platform: generic
+  name: Work Street View
+  still_image_url: https://maps.googleapis.com/maps/api/streetview?size=600x600&location={{states.calendar.work.attributes.location}}
+  limit_refetch_to_url_change: true

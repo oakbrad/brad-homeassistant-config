@@ -1,0 +1,25 @@
+- name: Kitchen On
+  entities:
+    switch.kitchen_lights: on
+    switch.sink: on
+    light.stove:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    light.fridge:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 180
+    switch.edison_pendants: on
+
+- name: Kitchen Off
+  entities:
+    switch.kitchen_lights: off
+    switch.sink: off
+    light.stove:
+      state: off
+      transition: 6
+    light.fridge:
+      state: off
+      transition: 6
+    switch.edison_pendants: off

@@ -1,0 +1,48 @@
+#
+# AQUARIUM!
+# 30 mins before dawn to 1 hour after
+# 1 hour before sunset 4 hours after
+# Off at 10pm no matter what
+# Turn on 30 minutes before dawn
+
+- alias: Aquarium On Before Dawn
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: "-00:30:00"
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.aquarium
+# Turn off 1 hour after sunrise
+- alias: Aquarium Off After Sunrise
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: "+01:00:00"
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.aquarium
+# Turn on 1 hour before sunset
+- alias: Aquarium on Before Sunset
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-01:00:00"
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.aquarium
+# Turn off 4 hours after sunset or 10pm, whatever comes first
+- alias: Aquarium Goodnight
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "+04:00:00"
+    - platform: time
+      at: "22:00:00"
+  condition:
+    condition: state
+    entity_id: switch.aquarium
+    state: 'on'
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.aquarium

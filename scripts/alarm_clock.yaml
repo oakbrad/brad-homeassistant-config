@@ -1,0 +1,167 @@
+#
+# Alarm Clock Scripts
+#
+
+morning_coffee:
+  alias: Make Morning Coffee
+  sequence:
+    # Kill script if coffee maker isn't ready
+    - condition: state
+      entity_id: sensor.coffeemaker
+      state: 'Ready'
+    # To sync with Alarm Clock sequence...
+    # Start Coffee 4 minutes in
+    - delay: 00:04:00
+    - service: homeassistant.turn_on
+      entity_id: switch.coffeemaker
+
+morning_notification:
+  alias: Morning Notification
+  sequence:
+    - condition: state
+      entity_id: device_tracker.brad
+      state: 'home'
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "{{ states.sensor.friendly_date.state }}"
+        message: >
+            {{ states.sensor.dark_sky_hourly_summary.state }}\n
+            {{ states.sensor.dark_sky_temperature.state }}°F currently, high of {{ states.sensor.dark_sky_daily_high_temperature.state }}°F and low {{ states.sensor.dark_sky_daily_low_temperature.state }}°F.\n
+            {% if states('sensor.dark_sky_precip_probability') | float > 40 %}
+              Chance of rain is {{states.sensor.dark_sky_precip_probability}}%}
+            {% endif %}
+
+            {% if is_state('sensor.cal_work_today','True') %}
+            \nWORK - {{states.sensor.cal_work_job.state}} / {{states.sensor.cal_work_call_time.state}}\n@ {{states.sensor.cal_work_location.state}}\n
+            {% endif %}
+            {% if is_state('sensor.cal_fb_today','True') %}
+            EVENT - {{states.sensor.cal_fb_event.state}} / {{states.sensor.cal_fb_time.state}}\n@ {{states.sensor.cal_fb_location.state}}\n
+            {{states.sensor.cal_fb_url.state}}
+            {% endif %}
+        data:
+          attachment:
+            url: http://static.lawrencehallofscience.org/scienceview/scienceview.berkeley.edu/html/view/view_assets/images/newview.jpg
+            content-type: jpeg
+            hide-thumbnail: false
+
+#
+# 10 MINUTE ALARM SEQUENCE
+#
+# 0M Fade in lights, turn off torrents
+# 3M Turn on bedroom lights
+# 5M NPR comes on quietly, slowly transitions
+# 8M Bedroom light on 100%
+# 9.5M NPR at full volume
+# 10M Turn on all other lights
+#
+# Morning TTS notification triggered by separate automation
+#
+alarm_clock:
+  alias: Alarm Sequence
+  sequence:
+  # First things first... make coffee?
+    - service: script.turn_on
+      entity_id: script.morning_coffee
+
+  # Set House to Morning if it's before noon
+    - service: script.turn_on
+      entity_id: script.house_state_home_morning
+
+  # 10 MINUTE SEQUENCE
+    - service: light.turn_on
+      data:
+        entity_id: light.entry, light.dining_floor_lamp, light.floor_lamp, light.globes, light.fridge, light.stove
+        brightness: 255
+        rgb_color: [255,255,255]
+        transition: 600 # 10 minutes transition
+
+    # Throttle Downloads
+    - service: homeassistant.turn_on
+      entity_id: switch.transmission_turtle_mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.sabnzbd_turtle_mode
+
+    # Let lights fade in 3 minutes
+    - delay: 00:03:00
+
+   # Start fading in bedroom lights
+    # Tradfri doesn't do transitions yet, so currently calling it in dim here
+    - service: light.turn_on
+      data:
+        entity_id: light.bedroom
+        brightness: 25
+    - delay: 00:02:00
+    - service: light.turn_on
+      data:
+        entity_id: light.bedroom
+        brightness: 75
+
+    # 5 MINUTES INTO SEQUENCE
+
+    # TURN ON NPR
+    # raise volume 10% each minute
+    # volume will be my max (.8) at same time lights are 100%
+    #
+  #  - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 30
+    - delay: 00:00:45
+    # turn radio on
+#    - service: switch.turn_on
+#      entity_id: switch.radio_npr
+#    - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 20
+    - delay: 00:00:45
+    # wait one minute, raise by .1
+##      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 30
+    - delay: 00:00:45
+#    - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 40
+    - delay: 00:00:45
+    # Start fading in bedroom lights
+    # Tradfri doesn't do transitions yet, so currently calling it in dim here
+    - service: light.turn_on
+      data:
+        entity_id: light.bedroom
+        brightness: 100
+#    - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 50
+    - delay: 00:00:45
+#    - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 60
+    - delay: 00:00:45
+#    - service: input_slider.select_value
+#      data_template:
+#        entity_id: input_slider.radiovolume
+#        value: 70
+    - delay: 00:00:15
+    - service: light.turn_on
+      data:
+        entity_id: light.bedroom
+        brightness: 255
+
+    - service: homeassistant.turn_on
+      entity_id: script.tts_wake_up
+
+    # 10 MINUTES INTO SEQUENCE
+    #
+    # Finish up, turn everything else on
+    # Turn on closet/kitchen/bathroom
+    - service: switch.turn_on
+      entity_id: switch.kitchen_lights, switch.sink, switch.bathroom_light, switch.edison_pendants, switch.string_lights
+    - service: light.turn_on
+      entity_id: light.closet
+    # Turn on morning announcements, activated by motion in kitchen
+    - service: homeassistant.turn_on
+      entity_id: automation.alarm_clock_morning_announcements

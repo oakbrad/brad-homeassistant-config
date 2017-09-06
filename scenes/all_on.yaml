@@ -1,0 +1,39 @@
+#
+# All Lights On
+#
+- name: All Lights On
+  entities:
+    light.dining_floor_lamp: on
+    switch.sink: on
+    light.entry:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    light.closet: on
+    light.bedroom: on
+    light.fridge:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    switch.aquarium: on
+    switch.edison_pendants: on
+    light.stove:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    switch.kitchen_lights: on
+    switch.office: on
+    light.floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    light.back_overheads: on
+    switch.string_lights: on
+    light.front_overheads: on
+    light.globes:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    switch.work_lamp: on
+    switch.bathroom_light: on
+    switch.grow_light: on

@@ -1,0 +1,12 @@
+restart_ha:
+  alias: Restart HA
+  sequence:
+    - service: homeassistant.restart
+
+turn_on_red_mode:
+  alias: Turn On Red Mode
+  sequence:
+    - service: homeassistant.turn_on
+      entity_id: script.tts_alexa_on_crickets
+    - service: scene.turn_on
+      entity_id: scene.night_light

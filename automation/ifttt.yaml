@@ -1,0 +1,148 @@
+#
+# TODO LIST INTEGRATION
+# Trigger an IFTTT event that adds items to my Todoist list
+#
+# DON'T KILL YOUR FUCKING PLANTS
+#
+
+- alias: 'TODO Water Giant Philodendron'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.giant_philodendron_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_giant_philo"}
+- alias: 'TODO Water Rubber Plant'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.rubber_plant_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_rubber_plant"}
+- alias: 'TODO Water Palm'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.palm_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_palm"}
+- alias: 'TODO Water Giant Pothos'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.giant_pothos_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_giant_pothos"}
+- alias: 'TODO Water Projector Pothos'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.projector_pothos_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_projector_pothos"}
+- alias: 'TODO Water Hanging Red Pothos'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.hanging_red_pothos_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_hanging_red_pothos"}
+- alias: 'TODO Water Hanging Spider Plant'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.hanging_spider_plant_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_hanging_spider_plant"}
+- alias: 'TODO Water Kitchen Pothos'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.kitchen_pothos_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_kitchen_pothos"}
+- alias: 'TODO Water Small Philodendron'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.small_philodendron_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_small_philo"}
+- alias: 'TODO Water Window Spider Plant'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.window_spider_plant_moisture
+    below: 5
+  action:
+    service: ifttt.trigger
+    data: {"event":"water_plant_window_spider"}
+
+
+#
+# USING SELF AS TRIGGER
+# Fitbit polling is pretty limited
+# IFTT is sometimes fast sometimes delayed
+# Only use for stuff not time sensitive
+#
+
+#
+# When Fitbit logs new sleep (after I get up)
+# And no alarm set, turn on house
+#
+- alias: 'Fitbit Detects New Sleep'
+  trigger:
+    platform: event
+    event_type: new_sleep_logged
+  # If alarm is off, if it's between 0730 and 1130, and if I'm home
+  condition:
+    - condition: time
+      after: '07:30:00'
+      before: '12:00:00'
+    - condition: state
+      entity_id: automation.alarm_clock
+      state: 'off'
+    - condition: state
+      entity_id: device_tracker.brad
+      state: 'home'
+    - condition: state
+      entity_id: variable.house_state
+      state: 'Sleeping'
+  action:
+    # Turn on lights
+    - service: scene.turn_on
+      entity_id: scene.day_dim_lights
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Morning"
+    # DONE, except if coffee is wanted...
+    # if coffee is set, make the coffee
+    - condition: state
+      entity_id: sensor.coffeemaker
+      state: 'Ready'
+    - service: homeassistant.turn_on
+      entity_id: switch.coffeemaker
+#
+# When I weigh myself between 9P-12A
+# Start a good night sequence
+#
+- alias: Goodnight Weigh In
+  trigger:
+    platform: event
+    event_type: new_weigh_in
+  # 9pm - midnight
+  condition:
+    - condition: time
+      after: '21:00:00'
+  action:
+    service: scene.turn_on
+    entity_id: script.goodnight

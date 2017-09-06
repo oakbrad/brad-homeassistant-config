@@ -1,0 +1,103 @@
+- platform: limitlessled
+  bridges:
+    # official bridge config
+#    - host: 192.168.0.25
+#      version: 5
+#      port: 8899
+#      groups:
+#       - number: 1
+#         name: Fridge
+#       - number: 2
+#         name: Globes
+#       - number: 3
+#         name: Floor Lamp
+#       - number: 4
+#         name: Stove
+
+# UDP Gateway Emualtion (unreliable in scenes?)
+# Consolidated into 2 servers - less UDP?
+    - host: 192.168.0.20
+      version: 5
+      port: 8004
+      groups:
+       - number: 1
+         name: Entry
+       - number: 2
+         name: Dining Pendant
+       - number: 3
+         name: Office Pendant
+       - number: 4
+         name: Fridge
+    - host: 192.168.0.20
+      version: 5
+      port: 8005
+      groups:
+       - number: 1
+         name: Dining Floor Lamp
+       - number: 2
+         name: Stove
+       - number: 3
+         name: Floor Lamp
+       - number: 4
+         name: Globes
+
+# MiLight DIY hub as mqtt_json
+# Uses TCP v UDP - more reliable?
+#- name: "Floor Lamp"
+#  command_topic: lights/0x5000/rgbw/1
+#  <<: &MILIGHT_PARAMS
+#    platform: mqtt_json
+#    color_temp: false
+#    rgb: true
+#    brightness: true
+#    optimistic: false
+#    assumed_state: false
+#- name: "Globes"
+#  command_topic: lights/0x3000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Fridge"
+#  command_topic: lights/0x6000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Stove"
+#  command_topic: lights/0x7000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Dining Pendant"
+#  command_topic: lights/0x9000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Dining Floor Lamp"
+#  command_topic: lights/0x8000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Entry"
+#  command_topic: lights/0x2000/rgbw/1
+#  <<: *MILIGHT_PARAMS
+#- name: "Office Pendant"
+#  command_topic: lights/0x1/rgbw/1
+#  <<: *MILIGHT_PARAMS
+
+
+#
+# esp8266 Chinese bulb with AiLight firmware
+#
+- platform: mqtt_json
+  name: 'Crawl Space'
+  state_topic: 'light/entry'
+  command_topic: 'light/entry/set'
+  color_temp: true
+  brightness: true
+
+  rgb: true
+  white_value: true
+  effect: false
+  optimistic: false
+
+# BruhNode LED
+
+- platform: mqtt_json
+  name: "Notify LED"
+  state_topic: "BruhNode/LivingRoom"
+  command_topic: "BruhNode/LivingRoom/set"
+  brightness: true
+  flash: true
+  rgb: true
+  optimistic: false
+  qos: 0

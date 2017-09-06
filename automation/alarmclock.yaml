@@ -1,0 +1,58 @@
+#
+# Morning Routine Related
+#
+#
+
+#
+# ALARM CLOCK
+# based on:
+# https://github.com/master-kenobi/ha-alarmclock
+- alias: 'Alarm Clock'
+  trigger:
+    platform: template
+    value_template: '{{ states.sensor.time.state  ==  states.sensor.alarm_time.state  }}'
+  condition:
+    - condition: template
+      value_template: "{%- if is_state('input_boolean.alarmworkday', 'on') and is_state('sensor.cal_work_day', 'True') -%}True{%- elif is_state('input_boolean.alarmworkday','off') -%}True{%- else -%}False{%- endif %}"
+  action:
+    - service: script.turn_on
+      entity_id: script.alarm_clock
+
+
+#
+# Morning Announcements
+#
+# Detect morning routine, pause radio and do TTS, then turn on NPR
+#
+- alias: 'Alarm Clock Morning Announcements'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kitchen_motion_meta
+      to: 'on'
+  condition:
+    # TIME if after alarm but before 11a
+    - condition: time
+      after: '04:00:00'
+    - condition: time
+      before: '11:00:00'
+    # IF alarm clock is on
+    - condition: state
+      entity_id: automation.alarm_clock
+      state: 'on'
+    # Some lights must be on
+    - condition: template
+      value_template: "{{ states.binary_sensor.are_any_lights_on.state != 'off' }}"
+  action:
+    # TURN RADIO OFF, PLAY TTS ANNOUNCEMENTS
+#    - service: switch.turn_off
+#      entity_id: switch.radio_npr
+    - delay: 00:00:02
+    - service: script.tts_morning_info
+    - service: script.morning_notification
+    - delay: 00:00:20
+#    - wait_template: "{{ states.media_player.vlc_tts.state == 'idle' }}"
+#      timeout: 00:00:50
+#    - service: switch.turn_on
+#      entity_id: switch.radio_npr
+    - service: homeassistant.turn_off
+      entity_id: automation.alarm_clock_morning_announcements

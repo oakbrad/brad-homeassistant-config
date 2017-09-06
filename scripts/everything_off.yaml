@@ -1,0 +1,76 @@
+# Master script for ALL LIGHTS OFF
+# Turns off all with clean up for milight
+# Also turns off additional items via-sub scripts
+#  * group.tracked_users = not_home
+#    * turn off Alexa, bathroom fan, bandwidth throttling
+#  * roku = playing
+#    * turn off grow light, aquarium, bathroom_fan
+everything_off:
+  alias: All Off
+  sequence:
+    # LIGHTS!!!
+    # Turn off switches
+    - service: homeassistant.turn_off
+      entity_id: switch.sink, switch.string_lights, switch.office, switch.edison_pendants, switch.kitchen_lights, switch.work_lamp, switch.bathroom_light
+    # Turn off non-milight lights with transitions
+    - service: light.turn_off
+      data:
+        entity_id: light.back_overheads, light.front_overheads
+        transition: 6
+    # Turn off milights by individual bulbs (registers state in HA)
+    - service: light.turn_off
+      data:
+        entity_id: light.dining_floor_lamp, light.entry, light.fridge, light.stove, light.floor_lamp, light.globes, light.office_pendant
+        transition: 6
+    # Turn off non-milight lights that don't support transitions (Tradfri)
+    - service: light.turn_off
+      entity_id: light.bedroom, light.closet
+
+    # NOT HOME
+    # If I'm not home, TTS tell Alexa to shut up.
+    # Turn off bandwidth restrictions
+    - service: script.turn_on
+      entity_id: script.everything_off_not_home
+    # MEDIA PLAYING
+    # Turn off additional lights
+    - service: script.turn_on
+      entity_id: script.everything_off_movietime
+
+    # LAST STEP: CLEAN UP MILIGHTS
+    - delay: '00:00:07'
+    # HA does not see these state changes, they go direct to hub
+    - service: script.turn_on
+      entity_id: script.milight_front_off
+    - delay: '00:00:01'
+    - service: script.turn_on
+      entity_id: script.milight_back_off
+    - delay: '00:00:01'
+    - service: script.turn_on
+      entity_id: script.milight_front_off
+    - delay: '00:00:01'
+    - service: script.turn_on
+      entity_id: script.milight_back_off
+#
+# SUB SCRIPTS
+#
+everything_off_not_home:
+  alias: Not Home, Turn Off More Stuff
+  sequence:
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'not_home'
+
+    - service: homeassistant.turn_off
+      entity_id: switch.bathroom_fan, switch.transmission_turtle_mode, input_boolean.sabnzbd_turtle_mode
+    - service: script.turn_on
+      entity_id: script.tts_alexa_shut_up
+
+everything_off_movietime:
+  alias: All Off, Movie Time
+  sequence:
+    - condition: state
+      entity_id: media_player.roku_3__4124cg078650
+      state: 'playing'
+
+    - service: homeassistant.turn_off
+      entity_id: switch.grow_light, switch.aquarium, switch.bathroom_fan

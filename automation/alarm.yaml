@@ -1,0 +1,194 @@
+#
+#
+# Alarm Triggers
+#
+#
+# For all alarm related automations, use:
+#    - condition: state
+#      entity_id: input_boolean.alarm_override
+#      state: 'off'
+#
+# Allows a manual override switch for everything
+
+- alias: 'ALARM ALERT - Door Open'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.front_door
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.loft_alarm
+      state: 'armed_away'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - service: alarm_control_panel.alarm_trigger
+      entity_id: alarm_control_panel.ha_alarm
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "ALARM ALERT"
+        message: "Front door opened\n{{ states.sensor.date__time.state }}"
+        data: 
+          attachment:
+            url: !secret camera_frontdoor_jpg
+            content-type: jpeg
+            hide-thumbnail: false
+    - delay: '00:00:05'
+    - service: tts.amazon_polly_say
+      entity_id: media_player.vlc_tts
+      data_template:
+        message: 'Your presence has been detected and recorded, thank you'
+#
+# Audible Notifications
+#
+
+# If door opens while I'm home and 'armed home' is set
+- alias: 'Alarm Announce - Door Open'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.front_door
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'home'
+    - condition: state
+      entity_id: alarm_control_panel.loft_alarm
+      state: 'armed_home'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    service: shell_command.alarm_sound_doorchime
+
+
+# If alarm changes from 'disarmed' to 'pending' announce 
+- alias: 'Alarm Announce - Pending Arm'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.loft_alarm
+      to: 'pending'
+  condition:
+    - condition: time
+      after: '08:30:00'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off' 
+  action:
+    - service: homeassistant.turn_off
+      entity_id: switch.mpd_pi
+    # "Alarm is being armed..." 2s
+    - service: tts.amazon_polly_say
+      entity_id: media_player.vlc_tts
+      data_template:
+        message: 'Alarm activated'
+    # Beep.. beep. beep.. turn off after done pending state
+    - service: script.turn_on
+      entity_id: script.alarm_pending_loop
+
+# If alarm changes from 'pending' to 'armed home'
+# Turn off pending loop, then announce it
+# Not dependent on tracked_users in order to kill loop after I leave
+#
+- alias: 'Alarm Announce - Armed Home'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.loft_alarm
+      to: 'armed_home'
+  condition:
+    - condition: time
+      after: '08:30:00'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - delay: "00:00:02"
+#    - service: shell_command.alarm_sound_alarm_is_armed_home
+    - service: tts.amazon_polly_say
+      entity_id: media_player.vlc_tts
+      data_template:
+        message: 'Alarm is now armed home'
+
+# If alarm changes from 'pending' to 'armed away'
+# Turn off pending loop, then announce it
+#
+- alias: 'Alarm Announce - Armed Away'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.loft_alarm
+      to: 'armed_away'
+  condition:
+    - condition: time
+      after: '08:30:00'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - delay: "00:00:02"
+#    - service: shell_command.alarm_sound_alarm_is_armed    
+    - service: tts.amazon_polly_say
+      entity_id: media_player.vlc_tts
+      data_template:
+        message: 'Alarm is now armed away'
+
+# If alarm is disarmed, announce
+- alias: 'Alarm Announce - Disarmed'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.loft_alarm
+      to: 'disarmed'
+  condition:
+    - condition: time
+      after: '08:30:00'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - delay: "00:00:01"
+#    - service: shell_command.alarm_sound_disarmed
+    - service: tts.amazon_polly_say
+      entity_id: media_player.vlc_tts
+      data_template:
+        message: 'Alarm is now disarmed'
+    
+#
+# Change Alarm Status based on presence
+# Arm Away when I leave, Arm Home when I arrive home
+#
+# Turning on guest_mode disables these
+# So status stays what I leave it even if I come/go
+#
+
+# If tracked_users leave and no guests are here, arm away
+- alias: 'Alarm - House Empty, Arm Away'
+  trigger:
+    - platform: state
+      entity_id: group.tracked_users
+      to: 'not_home'
+  condition:
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - service: script.turn_on
+      entity_id: script.alarm_arm_away
+
+- alias: 'Alarm - Arm Home'
+  trigger:
+    - platform: state
+      entity_id: group.tracked_users
+      to: 'home'
+  condition:
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.alarm_override
+      state: 'off'
+  action:
+    - service: script.turn_on
+      entity_id: script.alarm_arm_home

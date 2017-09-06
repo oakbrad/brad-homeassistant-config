@@ -1,0 +1,17 @@
+broker: 192.168.0.6
+port: 1883
+client_id: home-assistant-1
+keepalive: 60
+username: !secret mqtt_user
+password: !secret mqtt_pass
+protocol: 3.1
+birth_message:
+  topic: 'hass/status'
+  payload: 'online'
+  qos: 1
+  retain: true
+will_message:
+  topic: 'hass/status'
+  payload: 'offline'
+  qos: 1
+  retain: true

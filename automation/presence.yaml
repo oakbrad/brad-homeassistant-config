@@ -1,0 +1,295 @@
+#
+# Update Meta Device Tracker
+#
+- alias: "Update Brad's Meta Tracker Home"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.brad_ios, device_tracker.brad_owntracks, device_tracker.brad_ping
+      to: 'home'
+    - platform: homeassistant
+      event: start
+  action:
+    service: python_script.meta_device_tracker
+    data_template:
+      entity_id: '{{trigger.entity_id}}'
+      meta_entity: 'Brad'
+
+# Add a delay here
+- alias: "Update Brad's Meta Track Away"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.brad_ios, device_tracker.brad_owntracks
+      to: 'not_home'
+      for:
+        minutes: 10
+  action:
+    service: python_script.meta_device_tracker
+    data_template:
+      entity_id: '{{trigger.entity_id}}'
+      meta_entity: 'Brad'
+
+# Update Last Motion variable
+- alias: "Update Last Motion"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bathroom_motion, binary_sensor.closet_motion, binary_sensor.entry_motion_meta, binary_sensor.dining_motion_meta, binary_sensor.kitchen_motion_meta, binary_sensor.livingroom_motion_meta, binary_sensor.office_motion
+      to: 'on'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: last_motion
+        attributes_template: >
+            {
+              "history_1": "{{ variable.state }}",
+              "history_2": "{{ variable.attributes.history_1 }}",
+              "history_3": "{{ variable.attributes.history_2 }}"
+            }
+      data_template:
+        value: "{{ trigger.to_state.attributes.friendly_name }}"
+#
+# Turn on evening lighting if someone is home at SUNSET
+#
+- alias: 'Sunset Transition'
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-00:40:00"
+  condition:
+    condition: state
+    entity_id: group.tracked_users
+    state: 'home'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.evening_bright_lights
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Evening"
+
+
+
+#
+# Turn on lights when someone comes home
+#
+- alias: 'Welcome Home - Day'
+  trigger:
+    platform: state
+    entity_id: group.tracked_users
+    from: 'not_home'
+    to: 'home'
+  condition:
+    - condition: sun
+      after: sunrise
+    - condition: sun
+      before: sunset
+  action:
+    - service: scene.turn_on
+      entity_id: scene.day_dim_lights
+    - service: homeassistant.turn_on
+      entity_id: switch.transmission_turtle_mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.sabnzbd_turtle_mode
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Day"
+
+# Same thing but differnet scene for evening
+- alias: 'Welcome Home - Evening'
+  trigger:
+    platform: state
+    entity_id: group.tracked_users
+    from: 'not_home'
+    to: 'home'
+  condition:
+    - condition: sun
+      after: sunset
+    - condition: sun
+      after: sunrise
+  action:
+    - service: scene.turn_on
+      entity_id: scene.night_dim_lights
+    - service: homeassistant.turn_on
+      entity_id: switch.transmission_turtle_mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.sabnzbd_turtle_mode
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Evening"
+
+# Same thing but differnet scene for Midnight-430am
+- alias: "Welcome Home - Very Late"
+  trigger:
+    platform: state
+    entity_id: group.tracked_users
+    from: 'not_home'
+    to: 'home'
+  condition:
+    - condition: time
+      before: '05:30:00'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.night_dim_lights
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Late"
+#    - service: script.turn_on
+#      entity_id: script.tts_alexa_on_crickets
+
+#
+# TURN EVERYTHING OFF WHEN NO ONE IS HOME
+#
+# IF no one is home, turn off the lights and bandwidth throttles
+# If no one is home & NPR is playing, turn off NPR
+- alias: See Ya Later
+  trigger:
+    platform: state
+    entity_id: group.tracked_users
+    to: 'not_home'
+  action:
+    - service: script.turn_on
+      entity_id: script.everything_off
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Away"
+
+
+#
+# ADDITIONAL AUTOMATIONS FOR UPDATING variable.house_state
+#
+
+
+# If lights off for 15 minutes, it's after 8:30p, I'm home and not watching a movie...
+- alias: Auto Sleep
+  trigger:
+    platform: state
+    entity_id: input_boolean.are_any_lights_on
+    to: 'off'
+    for:
+      minutes: 15
+  condition:
+    - condition: time
+      after: '20:30:00'
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'home'
+    - condition: template
+      value_template: "{{ states.media_player.roku_3__4124cg078650.state != 'playing' }}"
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Sleeping"
+
+# Change to Home Morning if No alarm wakes me up
+# If coffee is being made, if I'm home, if no alarm set, if before noon, if I was asleep
+- alias: Wake Up Non Alarm Day
+  trigger:
+    platform: state
+    entity_id: sensor.coffeemaker
+    to: "Brewing"
+  condition:
+    - condition: state
+      entity_id: variable.house_state
+      state: "Sleeping"
+    - condition: state
+      entity_id: group.tracked_users
+      state: "home"
+    - condition: time
+      before: '12:00:00'
+    - condition: state
+      entity_id: automation.alarm_clock
+      state: 'off'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Morning"
+
+- alias: Noon Wake Up Ya Bum
+  trigger:
+    platform: time
+    at: '12:00:00'
+  condition:
+    - condition: state
+      entity_id: automation.alarm_clock
+      state: 'off'
+    - condition: state
+      entity_id: variable.house_state
+      state: 'Sleeping'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Day"
+    - service: script.turn_on
+      entity_id: script.alarm_clock
+
+- alias: Morning to Day Transition
+  trigger:
+    platform: time
+    at: '12:00:00'
+  condition:
+    - condition: state
+      entity_id: variable.house_state
+      state: 'Home Morning'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Day"
+
+- alias: Night to Late Transition
+  trigger:
+    platform: time
+    at: '00:00:00'
+  condition:
+    - condition: state
+      entity_id: variable.house_state
+      state: "Home Evening"
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Late"
+
+- alias: House State to Vacation
+  trigger:
+    platform: time
+    minutes: 5
+  condition:
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'not_home'
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+    - condition: template
+      value_template: "{{ states.variable.house_state.state != 'Vacation' }}"
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Vacation"
+
+- alias: House State to Guest Mode
+  trigger:
+    platform: time
+    minutes: 5
+  condition:
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'not_home'
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'on'
+    - condition: template
+      value_template: "{{ states.variable.house_state.state != 'Guest Mode' }}"
+  action:
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Guest Mode"

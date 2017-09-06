@@ -1,0 +1,144 @@
+#
+# NOTIFICATIONS!!!
+#
+
+#
+# Close Window if Bad Weather
+#
+# triggered by weather
+# if i'm home, after 5:30p, after sunset, if window is open
+#
+- alias: 'Notify - Reminder to Close Window'
+  trigger:
+    # Rain tomorrow
+    - platform: numeric_state
+      entity_id: sensor.dark_sky_precip_probability_1
+      above: 60
+    # Cold below 50F
+    - platform: numeric_state
+      entity_id: sensor.dark_sky_daily_low_temperature
+      below: 50
+  condition:
+    - condition: state
+      entity_id: binary_sensor.left_window
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.bradhome
+      state: 'on'
+    - condition: time
+      after: '17:30:00'
+    - condition: sun
+      after: sunset
+  action:
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "Reminder"
+        message: "Chance of rain is {{ states.sensor.dark_sky_precip_probability_1.state }}% tomorrow. The low tonight is {{ states.sensor.dark_sky_daily_low_temperature }}F.\nClose the window."
+
+
+#
+# Alert: Critical Device Offline
+# Condition: Once an Hour
+#
+- alias: 'Notify - Critical Device Offline'
+  trigger:
+    - platform: state
+      entity_id: sensor.ikeatradfri_online, sensor.synology_online, sensor.espmilight_online
+      from: 'Online'
+      to: 'Offline'
+      for:
+        minutes: 5
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: >
+          {% if states.automation.notify__critical_device_offline.last_triggered is not none %}
+            {% if as_timestamp(now()) | int   -  as_timestamp(states.automation.notify__critical_device_offline.attributes.last_triggered) | int > 3600 %} true {% else %} false
+            {% endif %}
+          {% else %}
+          false
+          {% endif %}
+  action:
+    service: notify.ios_bradwenner_bradphone
+    data:
+      title: "System Message"
+      message: "{{ trigger.to_state.attributes.friendly_name }} has gone offline. Check status to restore functionality."
+
+
+#
+# One hour after sunset...
+# KILL KILL KILL
+#
+- alias: 'Notify - Full Moon'
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "01:00:00"
+  condition:
+    condition: state
+    entity_id: sensor.moon
+    state: 'Full moon'
+  action:
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "Hail Satan"
+        message: "Rejoice, the full moon is upon us."
+
+# Remind me to Refill Coffee
+# At 10:30p, if I'm home, if Alarm is set, if Coffee is 'RefillWater'+
+#
+- alias: 'Notify - Evening Coffee Reminder'
+  trigger:
+    platform: time
+    at: '22:30:00'
+  condition:
+    - condition: state
+      entity_id: device_tracker.brad
+      state: 'home'
+    - condition: state
+      entity_id: automation.alarm_clock
+      state: 'on'
+    - condition: state
+      entity_id: sensor.coffeemaker
+      state: 'RefillWater'
+  action:
+    service: notify.ios_bradwenner_bradphone
+    data:
+      title: "Reminder"
+      message: "Alarm is set but coffee machine needs to be refilled."
+
+#
+# HA Pi Disk Use Gets Above 65%
+- alias: 'Notify - HA Pi Disk Use'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.disk_use__2
+    above: 65
+  action:
+    service: notify.ios_bradwenner_bradphone
+    data:
+      title: "System Warning"
+      message: "HomeAssistant Disk Space is Low"
+- alias: 'Notify -  HA Pi Disk Use Critical'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.disk_use__2
+    above: 90
+  action:
+    service: notify.ios_bradwenner_bradphone
+    data:
+      title: "System Warning"
+      message: "HomeAssistant Disk Space is CRITICALLY Low"
+
+#
+# NEW HA Release
+- alias: 'Notify - New Home Assistant'
+  trigger:
+    platform: state
+    entity_id: updater.updater
+  action:
+    service: notify.ios_bradwenner_bradphone
+    data:
+      title: "System Message"
+      message: "Home Assistant {{ states.updater.updater.state }} is now available."

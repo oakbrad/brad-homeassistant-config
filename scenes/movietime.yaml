@@ -1,0 +1,46 @@
+# If player goes from playing to pause, dim the lights for bathroom/kitchen
+- name: Movie Paused
+  entities:
+    light.floor_lamp:
+      state: on
+      transition: 8
+      brightness: 50
+    light.office_pendant:
+      state: on
+      transition: 8
+      brightness: 50
+    switch.bathroom_light: on
+    light.entry:
+      state: on
+      transition: 8
+      brightness: 50
+    light.fridge:
+      state: on
+      transition: 8
+      brightness: 50
+    light.dining_floor_lamp:
+      state: on
+      transition: 8
+      brightness: 50
+
+# If player goes from paused to playing, do pause movie in reverse
+- name: Movie Resumed
+  entities:
+    light.floor_lamp:
+      state: off
+      transition: 8
+    switch.office: off
+    light.office_pendant:
+      state: off
+      transition: 8
+    switch.bathroom_light: off
+    light.entry:
+      state: off
+      transition: 8
+    light.fridge:
+      state: off
+      transition: 8
+    light.closet: off
+    light.dining_floor_lamp:
+      state: off
+      transition: 8

@@ -1,0 +1,14 @@
+- name: Diningroom On
+  entities:
+    light.dining_floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      transition: 6
+    switch.string_lights: on
+
+- name: Diningroom Off
+  entities:
+    light.dining_floor_lamp:
+      state: off
+      transition: 6
+    switch.string_lights: off

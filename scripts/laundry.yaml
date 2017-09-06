@@ -1,0 +1,19 @@
+laundry_timer:
+  alias: Laundry Notification
+  sequence:
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "Reminder"
+        message: "Laundry timer started at {{states.sensor.time.state}}."
+    - delay: '00:45:00'
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "Reminder"
+        message: "Laundry time is done. Go get your laundry."
+    - condition: state
+      entity_id: group.tracked_users
+      state: 'home'
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: "Attention please. Your laundry is now ready"

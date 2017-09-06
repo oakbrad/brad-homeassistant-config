@@ -1,0 +1,111 @@
+#
+# TRANSIT MODE
+# Detect whether I have taken a bike or the car with me
+# Default to Transit if none out
+#
+# NONE (home)
+# TRANSIT (not_home but bikes/car are home)
+# BIKE (not_home and at least one bike not_home)
+# DRIVE (not_home and car not_home)
+
+- alias: "Welcome Back - Brad's Transit Mode is None"
+  trigger:
+    platform: state
+    entity_id: device_tracker.brad
+    to: 'home'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: transit_mode
+        value: "None"
+    - service: variable.set_variable
+      data:
+        variable: transit_bike
+        value: "None"
+
+# If I take car out, mark mode as driving
+- alias: "Brad's Transit Mode is Driving"
+  trigger:
+    platform: state
+    entity_id: device_tracker.brad
+    to: 'not_home'
+  condition:
+    condition: state
+    entity_id: device_tracker.beacon_element
+    state: 'not_home'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: transit_mode
+        value: "Drive"
+
+# If I take car out, mark mode as driving
+- alias: "Brad's Transit Mode is Public Transit"
+  trigger:
+    platform: state
+    entity_id: device_tracker.brad
+    to: 'not_home'
+  condition:
+    - condition: state
+      entity_id: device_tracker.beacon_element
+      state: 'home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_xo1
+      state: 'home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_saga
+      state: 'home'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: transit_mode
+        value: "Transit"
+
+- alias: "Brad's Transit Mode is Bike (XO-1)"
+  trigger:
+    platform: state
+    entity_id: device_tracker.brad
+    to: 'not_home'
+  condition:
+    - condition: state
+      entity_id: device_tracker.beacon_element
+      state: 'home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_xo1
+      state: 'not_home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_saga
+      state: 'home'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: transit_mode
+        value: "Bike"
+    - service: variable.set_variable
+      data:
+        variable: transit_bike
+        value: "Bridgestone XO-1"
+- alias: "Brad's Transit Mode is Bike (Saga)"
+  trigger:
+    platform: state
+    entity_id: device_tracker.brad
+    to: 'not_home'
+  condition:
+    - condition: state
+      entity_id: device_tracker.beacon_element
+      state: 'home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_xo1
+      state: 'home'
+    - condition: state
+      entity_id: device_tracker.beacon_bike_saga
+      state: 'not_home'
+  action:
+    - service: variable.set_variable
+      data:
+        variable: transit_mode
+        value: "Bike"
+    - service: variable.set_variable
+      data:
+        variable: transit_bike
+        value: "Soma Saga"

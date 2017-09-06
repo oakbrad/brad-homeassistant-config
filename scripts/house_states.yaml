@@ -1,0 +1,9 @@
+house_state_home_morning:
+  alias: Set House State to Home Morning
+  sequence:
+    - condition: time
+      before: '12:00:00'
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Home Morning"

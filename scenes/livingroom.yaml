@@ -1,0 +1,23 @@
+- name: Livingroom On
+  entities:
+    light.floor_lamp:
+      state: on
+      transition: 6
+    light.globes:
+      state: on
+      transition: 6
+    light.back_overheads:
+      state: on
+      transition: 6
+
+- name: Livingroom Off
+  entities:
+    light.floor_lamp:
+      state: off
+      transition: 6
+    light.globes:
+      state: off
+      transition: 6
+    light.back_overheads:
+      state: off
+      transition: 6

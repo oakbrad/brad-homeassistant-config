@@ -1,0 +1,21 @@
+#
+# SHELL COMMANDS
+#
+  changeradiovolume: 'mpc volume {{ states.input_slider.radiovolume.state | int }}'
+  changestereovolume: 'mpc -h 192.168.0.7 volume {{ states.input_slider.stereovolume.state | int }}'
+
+  triggertimelapse: '/home/homeassistant/.homeassistant/shell/timelapse.sh'
+
+#
+# Alarm Sound Effects
+# play for WAV, mplayer for MP3 seem to work best
+# 
+  alarm_sound_doorchime: 'play --volume .15 /home/homeassistant/.homeassistant/media/sounds_alarm/door_open.wav'
+  alarm_sound_pending: 'play --volume .15 /home/homeassistant/.homeassistant/media/sounds_alarm/alarm_pending_beep.wav'
+
+
+# 
+# FRIDGE KIOSK CONTROL
+#
+  fridgepanel_screensaveroff: "curl -X POST 'http://192.168.0.52:2323/?cmd=triggerMotion&password=thisisnot'"
+  fridgepanel_loaddefaultview: "curl -X POST 'http://192.168.0.52:2323/?cmd=loadStartURL&password=thisisnot'"

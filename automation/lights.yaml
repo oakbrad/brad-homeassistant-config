@@ -1,0 +1,314 @@
+#
+#
+# AUTOMATIONS RELATED TO LIGHTS
+#
+#
+#
+
+- alias: Update Are Lights On Sensor
+  trigger:
+    platform: state
+    # is there a better way to do this?
+    entity_id: switch.aquarium, switch.edison_pendants, switch.office, switch.sink, switch.work_lamp, switch.bathroom_light, switch.kitchen_lights, light.bedroom,light.closet,light.crawl_space,light.dining_floor_lamp,light.entry,light.floor_lamp,light.fridge,light.globes,light.office_pendant,light.stove,light.back_overheads,light.front_overheads
+  action:
+    - service: python_script.are_any_lights_on
+
+
+#
+# NIGHT LIGHTS
+#
+
+- alias: Kitchen Night Light On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_motion_meta
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.are_any_lights_on
+      state: 'off'
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    # Turn on Night Light Mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.nightlight_kitchen
+    - service: light.turn_on
+      entity_id: light.fridge, light.stove
+      data:
+        brightness: 10
+        transition: 8
+        color_name: red
+- alias: Kitchen Night Light Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_motion_meta
+    to: 'off'
+    for:
+      minutes: 1
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.nightlight_kitchen
+      state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.stove, light.fridge
+      data:
+        transition: 5
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.nightlight_kitchen
+
+- alias: Living Room Night Light On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.living_room_motion
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.are_any_lights_on
+      state: 'off'
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    # Turn on Night Light Mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.nightlight_livingroom
+    - service: light.turn_on
+      entity_id: light.floor_lamp
+      data:
+        brightness: 60
+        transition: 4
+        color_name: red
+- alias: Living Room Night Light Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.living_room_motion
+    to: 'off'
+    for:
+      minutes: 1
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.nightlight_livingroom
+      state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.floor_lamp
+      data:
+        transition: 5
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.nightlight_livingroom
+
+- alias: Bedroom Night Light On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.entry_motion, binary_sensor.bathroom_motion
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.are_any_lights_on
+      state: 'off'
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    # Turn on Night Light Mode
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.nightlight_bedroom
+    - service: light.turn_on
+      entity_id: light.entry
+      data:
+        brightness: 10
+        transition: 3
+        color_name: red
+- alias: Bedroom Night Light Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.entry_motion, binary_sensor.bathroom_motion
+    to: 'off'
+    for:
+      seconds: 15
+  condition:
+    - condition: state
+      entity_id: input_boolean.nightlight_override
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.nightlight_bedroom
+      state: 'on'
+  action:
+    - service: light.turn_off
+      entity_id: light.entry
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.nightlight_bedroom
+
+#
+# MOTION LIGHTS
+#
+
+
+
+# Office Lights on when Motion Detected
+- alias: Office Lights On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.office_motion
+    to: 'on'
+  condition:
+    condition: state
+    entity_id: switch.office
+    state: 'off'
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.office, switch.work_lamp
+- alias: Office Lights Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.office_motion
+    to: 'off'
+    for:
+      minutes: 10
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.office, switch.work_lamp
+
+# Closet Lights on when Motion Detected
+# Not between 12am-6am
+- alias: Closet Lights On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.closet_motion
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: light.closet
+      state: 'off'
+    - condition: time
+      after: '06:00:00'
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.closet
+# Turn Closet LIghts off After 10 minutes no motion
+- alias: Closet Lights Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.closet_motion
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.closet
+
+
+# Bathroom Lights Turned on by Motion Sensor
+# Not between 12am-6am
+- alias: Bathroom Lights On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.bathroom_motion
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: switch.bathroom_light
+      state: 'off'
+    - condition: time
+      after: '06:00:00'
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.bathroom_light
+
+# Bathroom Lights & Fan Turned Off After No Motion 5 minutes
+# Unless 'Last Motion' was Bathroom
+- alias: Bathroom Lights & Fan Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.bathroom_motion
+    to: 'off'
+    for:
+      minutes: 12
+  # If the dog walks around while I'm showering, this won't work. hmm...
+  condition:
+    condition: template
+    value_template: "{{ states.variable.last_motion.state != 'Bathroom Motion' }}"
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.bathroom_light, switch.bathroom_fan
+
+# Crawl Space Lights On When Open
+- alias: Crawl Space Lights On
+  trigger:
+    platform: state
+    entity_id: binary_sensor.crawl_space_door
+    to: 'on'
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.crawl_space
+# Crawl Space Lights Off
+- alias: Crawl Space Lights Off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.crawl_space_door
+    to: 'off'
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.crawl_space
+
+#
+# Link Stove/Fridge light with Kitchen Switch
+#
+- alias: Turn on Kitchen Lights with Wall Switch
+  trigger:
+    - platform: state
+      entity_id: switch.kitchen_lights
+      to: 'on'
+  action:
+    service: scene.turn_on
+    entity_id: scene.kitchen_on
+# Then turn them off again when Kitchen Switch go off
+- alias: Turn off Kitchen Lights with Wall Switch
+  trigger:
+    - platform: state
+      entity_id: switch.kitchen_lights
+      to: 'off'
+  action:
+    service: scene.turn_on
+    entity_id: scene.kitchen_off
+
+#
+# Link Office Pendant with Office Switch
+#
+- alias: Turn on Office with Office Switch
+  trigger:
+    - platform: state
+      entity_id: switch.office
+      from: 'off'
+      to: 'on'
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.office_pendant, switch.work_lamp
+# Then turn them off again when Office Switch go off
+- alias: Turn off Office with Office Switch
+  trigger:
+    - platform: state
+      entity_id: switch.office
+      from: 'on'
+      to: 'off'
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.office_pendant, switch.work_lamp

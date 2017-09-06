@@ -1,0 +1,53 @@
+#
+# Night Time Dim Lights
+#
+- name: Evening Bright Lights
+  entities:
+    light.dining_floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 30
+    switch.sink: on
+    light.entry:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+      transition: 30
+    light.stove:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 120
+    light.front_overheads:
+      state: on
+      brightness: 75
+    light.fridge:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 120
+    light.floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 120
+    switch.kitchen_lights: on
+    light.globes:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 120
+    switch.edison_pendants: on
+    light.office_pendant:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 200
+      transition: 120
+    light.back_overheads:
+      state: on
+      brightness: 65
+    switch.string_lights: on
+    light.bedroom:
+      state: on
+      brightness: 40

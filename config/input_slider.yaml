@@ -1,0 +1,28 @@
+alarmhour:
+  name: Hour
+  icon: mdi:timer
+  initial: 9
+  min: 0
+  max: 23
+  step: 1
+alarmminutes:
+  name: Minutes
+  icon: mdi:timer
+  initial: 0
+  min: 0
+  max: 59
+  step: 5
+radiovolume:
+  name: Pi Speaker
+  min: 25
+  max: 100
+  initial: 40
+  step: 1
+  icon: mdi:signal
+stereovolume:
+  name: Volume
+  initial: .45
+  min: 0.2
+  max: 0.85
+  step: 0.05
+  icon: mdi:signal

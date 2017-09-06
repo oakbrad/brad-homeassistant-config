@@ -1,0 +1,68 @@
+#
+# HYDROPONIC GROW LIGHT AUTOMATIONS
+#
+
+- alias: Garden On at Dawn
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: "+00:30:00"
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.grow_light
+# Turn off 1 hours after sunset
+# What's best way to automate this for winter? Fine for summer, for now
+- alias: Garden Off 30m Hour after Sunset
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "+00:30:00"
+#    - platform: time
+#      at: "22:00:00"
+  condition:
+    condition: state
+    entity_id: switch.grow_light
+    state: 'on'
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.grow_light
+
+- alias: 'Update Plant Problems'
+  trigger:
+    - platform: state
+      entity_id: plant.giant_philodendron, plant.giant_pothos, plant.hanging_red_pothos, plant.hanging_spider_plant, plant.kitchen_pothos, plant.palm, plant.projector_pothos, plant.rubber_plant, plant.small_philodendron, plant.window_spider_plant
+  action: 
+    - service: python_script.plant_problems
+
+# Afternoon reminder to water plants, if more than 3 need to be watered
+# This method of rate limiting:
+# https://community.home-assistant.io/t/limit-automation-triggering/14915
+#
+- alias: 'Notify - Plants Need Watering'
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.water_plants_number
+      above: 3
+  condition:
+    - condition: state
+      entity_id: input_boolean.bradhome
+      state: 'on'
+    - condition: time
+      after: "12:30:00"
+  action:
+    # Disable this automation
+    - service: automation.turn_off
+      entity_id: automation.notify__plants_need_watering
+
+    # Automation action
+    - service: notify.ios_bradwenner_bradphone
+      data:
+        title: "Water Plants"
+        message: "{{ states.sensor.water_plants_friendly }} need to be watered."
+
+    # Delay before being able to send this notification again
+    # 6 hours after 12:30.. at most it triggers twice a day
+    - delay:
+        hours: 6
+    - service: automation.turn_on
+      entity_id: automation.notify__plants_need_watering

@@ -1,0 +1,78 @@
+- alias: "Movie Started - Turn Off Lights"
+  trigger:
+    - platform: state
+      entity_id: media_player.roku_3__4124cg078650
+      from: 'unknown'
+      to: 'playing'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    - service: script.turn_on
+      entity_id: script.everything_off
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Watching Movie"
+
+- alias: "Movie Started V2 - Turn Off Lights"
+  trigger:
+    - platform: state
+      entity_id: media_player.roku_3__4124cg078650
+      from: 'idle'
+      to: 'playing'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    - service: script.turn_on
+      entity_id: script.everything_off
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Watching Movie"
+
+- alias: "Movie Paused - House Lights On"
+  trigger:
+    - platform: state
+      entity_id: media_player.roku_3__4124cg078650
+      from: 'playing'
+      to: 'paused'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    service: scene.turn_on
+    entity_id: scene.movie_paused
+
+- alias: "Movie Stopped - House Lights On"
+  trigger:
+    - platform: state
+      entity_id: media_player.roku_3__4124cg078650
+      from: 'playing'
+      to: 'idle'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.movie_paused
+  # Need to call update_house_state here to reset from 'watching movie'
+
+- alias: "Movie Resumed - House Lights Off"
+  trigger:
+    - platform: state
+      entity_id: media_player.roku_3__4124cg078650
+      from: 'paused'
+      to: 'playing'
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'
+  action:
+    service: scene.turn_on
+    entity_id: scene.movie_resumed

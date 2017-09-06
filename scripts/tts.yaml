@@ -1,0 +1,139 @@
+#
+# For turning on / off things via Alexa
+#
+tts_alexa_on_crickets:
+  alias: Alexa Turn on Crickets
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Alexa, tell sleep sounds to turn on crickets.
+
+tts_alexa_on_npr:
+  alias: Alexa Turn on NPR
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Alexa, play NPR everywhere.
+
+tts_alexa_shut_up:
+  alias: Shut Up Alexa
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Alexa, shut up.
+
+#
+# Laundry is Ready
+#
+tts_laundry_ready:
+  alias: Your Laundry is Ready
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Attention. Your laundry is ready.
+
+
+#
+# Morning Routine Info
+##
+
+tts_wake_up:
+  alias: Morning Wake Up Announcement
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Good morning {%if is_state('device_tracker.brad','home')%}Brad{%endif%}, the time is now {{states.sensor.time.state}}.
+          {% if is_state('device_tracker.brad','home') %}
+              {% if is_state('sensor.cal_work_today','True') %}
+              Work is at {{states.cal_work_location.state}} at {{states.cal_work_call_time.state}} today.
+              {% endif %}
+          {% endif %}
+          {% if is_state('sensor.coffeemaker','Brewing') %}
+          Your coffee is almost ready.
+          {% elif is_state('sensor.coffeemaker','Brewed') %}
+          Your coffee is ready.
+          {% endif %}
+
+tts_morning_info:
+  alias: Morning Information
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          Good Morning.
+
+          It's currently {{states.sensor.dark_sky_summary.state}} and  {{states.sensor.dark_sky_temperature.state|round}}°.
+          Today will be {{states.sensor.dark_sky_hourly_summary.state|replace(".", "")}}, with a high of {{states.sensor.dark_sky_daily_high_temperature.state|round}} degrees.
+
+          {% if states('sensor.dark_sky_precip_probability') | float > 40 %}
+          Remember to bring your umbrella today.
+          {% endif %}
+
+          {% if states('sensor.dark_sky_wind_speed') | float > 10 %}
+          Also be advised, wind is high at {{states.sensor.dark_sky_wind_speed.state|round}} miles per hour.
+          {% endif %}
+
+          {% if (states('sensor.cal_fb_today') == 'True') %}
+          You have an event today, {{states.sensor.cal_fb_event.state}}, starting at {{states.sensor.cal_fb_time.state}}.
+          {% endif %}
+
+          The time is now {{ now().hour}}  {{ "%0.02d" | format(now().strftime("%-M") | int) }}.
+          Alexa, turn on NPR everywhere.
+
+#
+# Using my plant_problems.py python script
+# Announce how many plants need to be fertilized or watered
+#
+
+tts_plant_info_fertilize:
+  alias: TTS Fertilize Plants
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          {% if is_state_attr('sensor.plant_problems','fertilize_number',0) %}
+          No plants need fertilizing.
+          {% elif states.sensor.plant_problems.attributes.fertilize_number | float > 0 %}
+          {{states.sensor.plant_problems.attributes.fertilize}} need fertilizing.
+          {% endif %}
+tts_plant_info_water:
+  alias: TTS Water Plants
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          {% if is_state_attr('sensor.plant_problems','water_number',0) %}
+          No plants need watering.
+          {% elif states.sensor.plant_problems.attributes.water_number | float > 0 %}
+          {{states.sensor.plant_problems.attributes.water}} need watering.
+          {% endif %}
+tts_plant_info:
+  alias: Announce Plant Info
+  sequence:
+    - service: tts.amazon_polly_say
+      data_template:
+        entity_id: media_player.vlc_tts
+        message: >
+          {% if is_state_attr('sensor.plant_problems','water_number',0) %}
+          No plants need watering.
+          {% elif states.sensor.plant_problems.attributes.water_number | float > 0 %}
+          {{states.sensor.plant_problems.attributes.water}} need to be watered.
+          {% endif %}
+          {% if is_state_attr('sensor.plant_problems','fertilize_number',0) %}
+          No plants need fertilizer.
+          {% elif states.sensor.plant_problems.attributes.fertilize_number | float > 0 %}
+          These plants {{states.sensor.plant_problems.attributes.fertilize}} need fertilizing.
+          {% endif %}

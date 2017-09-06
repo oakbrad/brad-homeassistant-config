@@ -1,0 +1,138 @@
+  window_container:
+    sensors:
+      moisture: sensor.window_container_moisture
+      temperature: sensor.window_air_temp
+      brightness: sensor.palm_light_intensity
+    min_moisture: 20
+    max_moisture: 1000
+    min_temperature: 45
+
+  rubber_plant:
+    sensors:
+      moisture: sensor.rubber_plant_moisture
+      battery: sensor.rubber_plant_battery
+      temperature: sensor.rubber_plant_temperature
+      conductivity: sensor.rubber_plant_conductivity
+      brightness: sensor.rubber_plant_light_intensity
+    min_moisture: 20
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  giant_philodendron:
+    sensors: 
+      moisture: sensor.giant_philodendron_moisture
+      battery: sensor.giant_philodendron_battery
+      temperature: sensor.giant_philodendron_temperature
+      conductivity: sensor.giant_philodendron_conductivity
+      brightness: sensor.giant_philodendron_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  giant_pothos:
+    sensors:
+      moisture: sensor.giant_pothos_moisture
+      battery: sensor.giant_pothos_battery
+      temperature: sensor.giant_pothos_temperature
+      conductivity: sensor.giant_pothos_conductivity
+      brightness: sensor.giant_pothos_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  hanging_red_pothos:
+    sensors:
+      moisture: sensor.hanging_red_pothos_moisture
+      battery: sensor.hanging_red_battery
+      temperature: sensor.hanging_red_temperature
+      conductivity: sensor.hanging_red_pothos_conductivity
+      brightness: sensor.hanging_red_pothos_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  hanging_spider_plant:
+    sensors:
+      moisture: sensor.hanging_spider_plant_moisture
+      battery: sensor.hanging_spider_plant_battery
+      temperature: sensor.hanging_spider_plant_temperature
+      conductivity: sensor.hanging_spider_plant_conductivity
+      brightness: sensor.hanging_spider_plant_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  kitchen_pothos:
+    sensors:
+      moisture: sensor.kitchen_pothos_moisture
+      battery: sensor.kithen_pothos_battery
+      temperature: sensor.kitchen_pothos_temperature
+      conductivity: sensor.kitchen_pothos_conductivity
+      brightness: sensor.kitchen_pothos_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  palm:
+    sensors:
+      moisture: sensor.palm_moisture
+      battery: sensor.palm_battery
+      temperature: sensor.palm_temperature
+      conductivity: sensor.palm_conductivity
+      brightness: sensor.palm_light_intensity
+    min_moisture: 20
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  projector_pothos:
+    sensors:
+      moisture: sensor.projector_pothos_moisture
+      battery: sensor.projector_pothos_battery
+      temperature: sensor.projector_pothos_temperature
+      conductivity: sensor.projector_pothos_conductivity
+      brightness: sensor.projector_pothos_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  small_philodendron:
+    sensors:
+      moisture: sensor.small_philodendron_moisture
+      battery: sensor.small_philodendron_battery
+      temperature: sensor.small_philodendron_temperature
+      conductivity: sensor.small_philodendron_conductivity
+      brightness: sensor.small_philodendron_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45
+
+  window_spider_plant:
+    sensors:
+      moisture: sensor.window_spider_plant_moisture
+      battery: sensor.window_spider_plant_battery
+      temperature: sensor.window_spider_plant_temperature
+      conductivity: sensor.window_spider_plant_conductivity
+      brightness: sensor.window_spider_plant_light_intensity
+    min_moisture: 10
+    max_moisture: 100
+    min_battery: 15
+    min_conductivity: 200
+#  min_temperature: 45

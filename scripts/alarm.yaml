@@ -1,0 +1,35 @@
+#
+# Buttons for UI
+#
+alarm_arm_home:
+  alias: Alarm Arm Home
+  sequence:
+    - service: alarm_control_panel.alarm_arm_home
+alarm_arm_away:
+  alias: Alarm Arm Away
+  sequence:
+    - service: alarm_control_panel.alarm_arm_away
+alarm_disarm:
+  alias: Alarm Disarm
+  sequence:
+    - service: alarm_control_panel.alarm_disarm 
+
+# Sound loop for 'pending'
+alarm_pending_loop:
+  alias: Alarm Pending Loop
+  sequence:
+    - condition: state
+      entity_id: alarm_control_panel.loft_alarm
+      state: 'pending'
+    - delay: "00:00:01"
+    - service: script.turn_on
+      entity_id: script.alarm_pending_sound
+
+alarm_pending_sound:
+  alias: Alarm Pending Sound
+  sequence:
+    - service: shell_command.alarm_sound_pending
+    - delay: "00:00:01"
+    - service: shell_command.alarm_sound_pending
+    - service: script.turn_on
+      entity_id: script.alarm_pending_loop

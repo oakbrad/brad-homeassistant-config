@@ -1,0 +1,53 @@
+- name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  radius: 75
+  icon: mdi:home
+
+- name: Studio
+  latitude: !secret studio_latitude
+  longitude: !secret studio_longitude
+  radius: 100
+  icon: mdi:castle
+
+- name: SF
+  latitude: 37.760929
+  longitude: -122.447416
+  radius: 6800
+  icon: mdi:bridge
+  passive: true
+
+#
+# Grocery Store Zones
+# Put in group.grocery_zone
+# FUTURE: When near grocery store, send groery list, webcam of fridge photo, etc.
+#
+
+#- name: Howden Market
+#  latitude: 37.8197876
+#  longitude: -122.2936726
+#  radius: 50
+#  icon: mdi:cart-outline
+
+#- name: KP Asian Market
+#  latitude: 37.816567
+#  longitude: -122.2670651
+#  radius: 50
+#  icon: mdi:cart-outline
+
+#- name: Whole Foods
+#  latitude: 37.8128521
+#  longitude: -122.2609735
+#  radius: 300
+#  icon: mdi:cart-outline
+
+#- name: Lucky Grocery
+#  latitude: 37.8001609
+#  longitude: -122.2531262
+#  radius: 200
+#  icon: mdi:cart-outline
+
+#- name: Sprouts Market
+#  latitude: 37.8175322
+#  longitude: -122.2636897
+#  radius: 250

@@ -1,0 +1,282 @@
+      name: Floorplan
+      image: /local/custom_ui/floorplan/studio.svg
+      stylesheet: /local/custom_ui/floorplan/floorplan.css
+
+      hide_app_toolbar:
+
+      last_motion_entity: variable.last_motion
+      last_motion_class: last-motion
+
+      groups:
+        - name: Lights
+          entities:
+            - switch.work_lamp
+            - switch.sink
+            - light.bedroom
+            - light.closet
+            - light.stove
+            - switch.bathroom_light
+            - light.entry
+            - switch.office
+            - switch.string_lights
+            - light.back_overheads
+            - light.front_overheads
+            - light.floor_lamp
+            - light.dining_floor_lamp
+            - light.globes
+            - light.office_pendant
+            - light.fridge
+            - switch.edison_pendants
+            - switch.kitchen_lights
+            - input_boolean.ui_livingroom
+            - input_boolean.ui_diningroom
+            - input_boolean.ui_kitchen
+          states:
+            - state: 'on'
+              class: 'light-on'
+            - state: 'off'
+              class: 'light-off'
+          action:
+            domain: homeassistant
+            service: toggle
+
+        - name: Alarm
+          entities:
+            - alarm_control_panel.loft_alarm
+          states:
+            - state: 'disarmed'
+              class: 'text-subheading'
+            - state: 'armed_home'
+              class: 'text-armed_home'
+            - state: 'pending'
+              class: 'text-alarm_pending'
+            - state: 'armed_away'
+              class: 'text-armed_away'
+
+        - name: Bikes
+          entities:
+            - device_tracker.beacon_bike_xo1
+            - device_tracker.beacon_bike_saga
+          states:
+            - state: 'not_home'
+              class: 'bike-gone'
+            - state: 'home'
+              class: 'bike-home'
+
+        - name: Media Players
+          entities:
+            - media_player.roku_3__4124cg078650
+            - media_player.vlc_tts
+          states:
+            - state: 'idle'
+              class: 'media-idle'
+            - state: 'unknown'
+              clsss: 'media-idle'
+            - state: 'off'
+              class: 'media-idle'
+            - state: 'playing'
+              class: 'media-playing'
+            - state: 'paused'
+              class: 'media-paused'
+
+        - name: Switches
+          entities:
+            - switch.aquarium
+            - switch.grow_light
+          states:
+            - state: 'on'
+              class: 'switch-on'
+            - state: 'off'
+              class: 'switch-off'
+          action:
+            domain: homeassistant
+            service: toggle
+
+        - name: Fans
+          entities:
+            - switch.bedroom_fan
+            - switch.bathroom_fan
+          states:
+            - state: 'on'
+              class: 'fan-on'
+            - state: 'off'
+              class: 'fan-off'
+          action:
+            domain: homeassistant
+            service: toggle
+
+        - name: Camera Buttons
+          entities:
+             - camera.car_location
+
+        - name: Cameras
+          entities:
+            - camera.front_door
+            - camera.east_bay
+          states:
+            - state: 'idle'
+              class: 'camera-idle'
+            - state: 'off'
+              class: 'camera-other'
+            - state: 'unknown'
+              class: 'camera-other'
+
+        - name: Motion
+          entities:
+            - binary_sensor.entry_motion
+            - binary_sensor.kitchen_motion_meta
+            - binary_sensor.closet_motion
+            - binary_sensor.dining_motion_meta
+            - binary_sensor.livingroom_motion_meta
+            - binary_sensor.bathroom_motion
+          states:
+            - state: 'off'
+              class: 'motion-none-background'
+            - state: 'on'
+              class: 'motion-background'
+          state_transitions:
+            - name: On to off
+              from_state: 'on'
+              to_state: 'off'
+              duration: 10
+
+        - name: Plants Button
+          elements:
+            - plants-button
+          action:
+            domain: class
+            service: toggle
+            data:
+              elements:
+                - plants-layer
+              classes:
+                - layer-visible
+                - layer-hidden
+              default_class: layer-hidden
+
+        - name: Scenes
+          entities:
+            - script.everything_off
+            - scene.day_dim_lights
+            - scene.evening_bright_lights
+            - scene.night_dim_lights
+            - scene.entertaining
+            - script.turn_on_red_mode
+          action:
+            domain: homeassistant
+            service: turn_on
+
+        - name: Openings
+          entities:
+            - binary_sensor.front_door
+            - binary_sensor.crawl_space_door
+          states:
+            - state: 'off'
+              class: 'opening-closed'
+            - state: 'on'
+              class: 'opening-open'
+
+        - name: Coffee Sensor
+          entities:
+            - sensor.coffeemaker
+          states:
+            - state: 'RefillWater'
+              class: 'coffee-refillwater'
+            - state: 'Ready'
+              class: 'coffee-ready'
+            - state: 'Brewed'
+              class: 'coffee-brewed'
+            - state: 'Brewing'
+              class: 'coffee-brewing'
+            - state: 'PlaceCarafe'
+              class: 'coffee-carafe'
+            - state: 'Refill'
+              class: 'coffee-refillwater'
+
+        - name: Plant sensors
+          entities:
+            - sensor.window_container_moisture
+            - sensor.window_spider_plant_moisture
+            - sensor.palm_moisture
+            - sensor.rubber_plant_moisture
+            - sensor.giant_philodendron_moisture
+            - sensor.projector_pothos_moisture
+            - sensor.small_philodendron_moisture
+            - sensor.kitchen_pothos_moisture
+            - sensor.hanging_spider_plant_moisture
+            - sensor.hanging_red_pothos_moisture
+            - sensor.giant_pothos_temperature
+          text_template: '${entity.state ? entity.state : "unknown"}'
+          class_template: '
+            var moist = parseFloat(entity.state.replace("%", ""));
+            if (moist < 10)
+              return "plant-notok";
+            else if (moist < 24)
+              return "plant-soon";
+            else if (moist > 25)
+              return "plant-ok";
+            else
+              return "plant-unknown";
+            '
+        - name: Rounded Temps
+          entities:
+            - sensor.dark_sky_daily_high_temperature
+            - sensor.dark_sky_daily_low_temperature
+            - sensor.indoor_mean_temp
+          text_template: '${entity.state ? Math.ceil(entity.state)  + "°": "undefined"}'
+          class_template: 'return "text-subheading";'
+
+        - name: Time
+          entities:
+            - sensor.time
+          class_template: 'return "text-time";'
+        - name: Text Day and Weather
+          entities:
+            - sensor.friendly_date_day
+            - sensor.alarm_time
+          class_template: 'return "text-subheading";'
+
+        - name: Presence
+          entities:
+            - group.tracked_users
+          text_template: '${entity.state ? entity.state.replace("not_home", "away") : "undefined"}'
+          class_template: 'return "text-button";'
+
+        - name: Dark Sky Sensors
+          entities:
+            - sensor.dark_sky_icon
+          image_template: '
+            var imageName = "";
+
+            switch (entity.state) {
+              case "clear-day":
+                imageName = "day";
+                break;
+
+              case "clear-night":
+                imageName = "night";
+                break;
+
+              case "partly-cloudy-day":
+                imageName = "cloudy-day-1";
+                break;
+
+              case "partly-cloudy-night":
+                imageName = "cloudy-night-1";
+                break;
+
+              case "cloudy":
+                imageName = "cloudy";
+                break;
+
+              case "rain":
+                imageName = "rainy-1";
+                break;
+
+              case "snow":
+                imageName = "snowy-1";
+                break;
+            }
+
+            return "http://ha.bradwenner.com:8123/local/custom_ui/floorplan/images/weather/" + imageName + ".svg";
+            '

@@ -1,0 +1,23 @@
+#
+# Daytime Dim Lights
+#
+- name: Day Dim Lights
+  entities:
+    light.dining_floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 175
+    light.entry:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    switch.kitchen_lights: on
+    light.stove:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 255
+    switch.edison_pendants: on
+    light.floor_lamp:
+      state: on
+      rgb_color: [255,255,255]
+      brightness: 150

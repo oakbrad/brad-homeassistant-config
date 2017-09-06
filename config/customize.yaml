@@ -1,0 +1,443 @@
+# GROUP PRIORITIES IN UI
+# DEFAULT VIEW
+# DEVICE VIEW
+    group.Overheads:
+      order: 1
+      emulated_hue: true
+    group.Bathroom:
+      order: 2
+      emulated_hue: true
+    group.Bedroom:
+      order: 3
+    group.Kitchen:
+      order: 4
+      emulated_hue: true
+    group.LivingRoom:
+      order: 6
+      emulated_hue: true
+    group.diningroom:
+      order: 5
+      friendly_name: Dining Room
+      emulated_hue: true
+    group.Office:
+      order: 7
+      emulated_hue: true
+    group.Misc:
+      order: 10
+# TABLET VIEW
+    group.TodayWeather:
+      order: 1
+    group.traveltimes:
+      order: 3
+    group.Rooms:
+      order: 4
+    group.Radio:
+      order: 2
+# CLIMATE GROUP
+    group.Today:
+      order: 1
+# SYSTEM GROUP
+    group.SystemOptions:
+      order: 1
+    group.BradsDevices:
+      order: 2
+
+
+    sensor.home_to_sf:
+      friendly_name: Drive to SF
+    sensor.home_to_16th_mission_bart:
+      friendly_name: BART to 16th Mission
+    sensor.home_to_richmond_bart:
+      friendly_name: BART to Richmond
+    camera.ip_webcam:
+      friendly_name: Kitchen
+    media_player.roku_3__4124cg078650:
+      friendly_name: Roku
+    media_player.vlc_tts:
+      friendly_name: Voice Announcements
+    binary_sensor.dining_motion_2:
+      friendly_name: Dining Motion
+    binary_sensor.front_door:
+      device_class: opening
+    light.notify_led:
+      icon: mdi:led-on
+      friendly_name: Notify LED
+    input_boolean.sabnzbd_turtle_mode:
+      icon: mdi:flash
+    sensor.indoor_mean_humidity:
+      icon: mdi:water-percent
+      friendly_name: Indoor Humidity
+    sensor.indoor_mean_temp:
+      icon: mdi:thermometer
+      friendly_name: Indoor Temp
+    input_boolean.are_any_lights_on:
+      extra_data_template: "{total_on} lights on"
+    sensor.solar_angle:
+      unit_of_measurement: "°"
+      icon: mdi:triangle-outline
+    sensor.yr_symbol:
+      friendly_name: " "
+    sensor.dark_sky_hourly_summary:
+      friendly_name: "Current:"
+    sensor.dark_sky_daily_summary:
+      friendly_name: "Forecast:"
+    sensor.dark_sky_temperature:
+      friendly_name: Current Temp
+    sensor.dark_sky_daily_high_temperature:
+      friendly_name: High
+    sensor.dark_sky_daily_high_temperature_1:
+      friendly_name: Forecast High
+    sensor.dark_sky_daily_low_temperature:
+      friendly_name: Low
+    sensor.dark_sky_daily_low_temperature_1:
+      friendly_name: Forecast Low
+    sensor.dark_sky_precip_probability:
+      friendly_name: Rain
+    sensor.dark_sky_precip_probability_1:
+      friendly_name: Forecast Rain
+    sensor.dark_sky_cloud_coverage:
+      friendly_name: Cloud
+    sensor.dark_sky_wind_speed:
+      friendly_name: Wind
+    sensor.dark_sky_wind_bearing:
+      friendly_name: Wind Bearing
+    sensor.dark_sky_cloud_coverage_1:
+      friendly_name: Forecast Cloud
+    sensor.water_plants:
+      icon: mdi:pine-tree
+    proximity.home:
+      friendly_name: Brad Home Proximity
+      icon: mdi:bullseye
+    device_tracker.brad:
+      friendly_name: Brad
+    device_tracker.brad_ping:
+      friendly_name: WiFi
+    device_tracker.brad_ios:
+      friendly_name: iOS
+    device_tracker.brad_owntracks:
+      friendly_name: Owntracks
+    device_tracker.beacon_element:
+      icon: mdi:car
+      friendly_name: Honda Element
+    device_tracker.beacon_bike_xo1:
+      icon: mdi:bike
+      friendly_name: Bridgestone XO-1
+    device_tracker.beacon_bike_saga:
+      icon: mdi:bike
+      friendly_name: Soma Saga
+    group.tracked_users:
+      icon: mdi:home-modern
+      show_last_changed: true
+    sun.sun:
+      show_last_changed: true
+    sensor.moon:
+      show_last_changed: true
+    zone.home:
+      beacon:
+        uuid: FDA50693-A4E2-4FB1-AFCF-C6EB07647825
+        major: 10004
+        minor: 5379
+    sensor.ikeatradfri_online:
+      icon: mdi:lightbulb-outline
+      show_last_changed: true
+    sensor.synology_online:
+      icon: mdi:cube-outline
+      show_last_changed: true
+    sensor.espmilight_online:
+      icon: mdi:lightbulb-outline
+      show_last_changed: true
+    sensor.windowcam_online:
+      icon: mdi:camcorder
+      show_last_changed: true
+    sensor.frontdoorcam_online:
+      icon: mdi:camcorder
+      show_last_changed: true
+    sensor.friendly_date:
+      icon: mdi:calendar
+    sensor.kitchen_smoke:
+      icon: mdi:fire
+    sensor.kitchen_humidity:
+      icon: mdi:water-percent
+    sensor.front_temperature:
+      icon: mdi:thermometer
+    sensor.front_humidity:
+      icon: mdi:water-percent
+    plant.window_container:
+      friendly_name: Window Container
+    plant.rubber_plant:
+      friendly_name: Rubber Plant
+    plant.giant_philodendron:
+      friendly_name: Giant Philodendron
+    plant.palm:
+      friendly_name: Palm
+    plant.projector_pothos:
+      friendly_name: Projector Pothos
+    plant.hanging_red_pothos:
+      friendly_name: Hanging Red Pothos
+    plant.hanging_spider_plant:
+      friendly_name: Hanging Spider Plant
+    plant.kitchen_pothos:
+      friendly_name: Kitchen Pothos
+    plant.small_philodendron:
+      friendly_name: Small Philodendron
+    plant.window_spider_plant:
+      friendly_name: Window Spider Plant
+    switch.bathroom_light:
+      friendly_name: Bath Light
+      icon: mdi:lightbulb
+      emulated_hue: true
+    switch.bathroom_fan:
+      friendly_name: Bath Fan
+      icon: mdi:fan
+      emulated_hue: true
+    plant.giant_pothos:
+      friendly_name: Giant Pothos
+    sensor.problem_plants:
+      extra_data_template: "{problem_plants}"
+    sensor.entry_temperature:
+      friendly_name: Entry Temp
+      icon: mdi:thermometer
+    sensor.giant_pothos_temperature:
+      friendly_name: Office Temp
+      icon: mdi:thermometer
+#      unit_of_measurement: "Fahrenheit"
+    sensor.hanging_red_pothos_temperature:
+      friendly_name: Living Room Temp
+      icon: mdi:thermometer
+#      unit_of_measurement: "Fahrenheit"
+    sensor.kitchen_pothos_temperature:
+      friendly_name: Kitchen Temp
+      icon: mdi:thermometer
+    sensor.window_spider_plant_light_intensity:
+      friendly_name: Window Light Intensity
+    variable.last_motion:
+      friendly_name: Motion Last Seen
+      icon: mdi:map-marker
+      show_last_changed: true
+    variable.house_state:
+      friendly_name: House State
+      show_last_changed: true
+    variable.transit_bike:
+      friendly_name: Which Bike
+    variable.transit_mode:
+      friendly_name: Transit Mode
+    binary_sensor.office_motion:
+      friendly_name: Office Motion
+      device_class: motion
+    binary_sensor.bathroom_motion:
+      friendly_name: Bathroom Motion
+      device_class: motion
+    binary_sensor.living_room_motion:
+      friendly_name: Living Room Motion
+      device_class: motion
+    light.tradfri_bulb_e26_opal_1000lm:
+      friendly_name: Bedroom Light
+      emulated_hue: true
+      emulated_hue_name: Bedroom
+    light.tradfri_bulb_e12_ws_opal_400lm_2:
+      friendly_name: Closet Lamp 1
+    light.tradfri_bulb_e12_ws_opal_400lm:
+      friendly_name: Closet Lamp 2
+    light.front_overheads:
+      friendly_name: Front Lights
+    light.back_overheads:
+      friendly_name: Back Lights
+    switch.edison_pendants:
+      icon: mdi:ceiling-light
+      emulated_hue: true
+    switch.sink:
+      icon: mdi:lightbulb-on
+      emulated_hue: True
+    switch.work_lamp:
+      icon: mdi:lamp
+      emulated_hue: true
+    light.dining_floor_lamp:
+      icon: mdi:lamp
+      assumed_state: false
+      emulated_hue: true
+    light.office_pendant:
+      icon: mdi:ceiling-light
+      emulated_hue: true
+      assumed_state: false
+    switch.string_lights:
+      icon: mdi:led-on
+      emulated_hue: true
+    switch.kitchen_lights:
+      friendly_name: Kitchen Switch
+      icon: mdi:toggle-switch
+      emulated_hue: true
+      emulated_hue_name: Kitchen
+    switch.bedroom_fan:
+      icon: mdi:fan
+      emulated_hue: True
+    sensor.air_pressure:
+      icon: mdi:gauge
+    sensor.carbon_monoxide:
+      icon: mdi:skull
+    sensor.battery_windowcam:
+      friendly_name: Window Camera
+      icon: mdi:cellphone-iphone
+    sensor.yr_fog:
+      friendly_name: Fog
+      icon: mdi:weather-fog
+    sensor.air_temperature:
+      icon: mdi:thermometer
+    sensor.humidity:
+      icon: mdi:water-percent
+    sensor.water_temperature:
+      icon: mdi:thermometer
+    sensor.alarm_time:
+      icon: mdi:timer
+    sensor.synology_storage:
+      icon: mdi:harddisk
+    sensor.synology_storage_free:
+      icon: mdi:harddisk
+    sensor.battery_frontmotion:
+      icon: mdi:battery-charging
+    sensor.battery_iphone:
+      show_last_changed: true
+      friendly_name: iPhone Battery
+    sensor.transmission_status:
+      show_last_changed: true
+      icon: mdi:folder-download
+    sensor.sabnzbd_status:
+      show_last_changed: true
+      icon: mdi:folder-download
+    sensor.transmission_down_speed_kbps:
+      icon: mdi:arrow-down-bold-circle-outline
+    sensor.transmission_up_speed_kbps:
+      icon: mdi:arrow-up-bold-circle-outline
+    sensor.sabnzbd_speed:
+      icon: mdi:arrow-down-bold-circle-outline
+    sensor.sabnzbd_queue:
+      icon: mdi:clock
+    switch.mpd_pi:
+      icon: mdi:speaker
+    switch.volumio:
+      icon: mdi:speaker
+    switch.radio_npr:
+      icon: mdi:radio
+      emulated_hue: true
+      emulated_hue_name: NPR
+    switch.radio_kalx:
+      icon: mdi:school
+    switch.radio_jazz:
+      icon: mdi:saxophone
+    switch.radio_metal:
+      icon: mdi:skull
+    switch.radio_kzsc:
+      icon: mdi:barley
+    switch.pi_shutdown:
+      icon: mdi:power
+    switch.pi_reboot:
+      icon: mdi:restart
+    switch.grow_light:
+      friendly_name: Grow Light
+      icon: mdi:leaf
+      emulated_hue: true
+      emulated_hue_name: Garden
+    switch.aquarium:
+      friendly_name: Aquarium Light
+      icon: mdi:cube
+      emulated_hue: true
+      emulated_hue_name: Aquarium
+    group.LivingRoomLamps:
+      icon: mdi:lightbulb
+      emulated_hue: true
+      emulated_hue_name: Globes
+    switch.office:
+      friendly_name: Office Switch
+      icon: mdi:lightbulb
+    input_boolean.alarmclock:
+      icon: mdi:alarm-check
+    automation.alarm_clock:
+      icon: mdi:alarm
+    light.floor_lamp:
+      icon: mdi:alarm-light
+      emulated_hue: true
+    light.stove:
+      emulated_hue: True
+    light.fridge:
+      icon: mdi:ceiling-light
+      emulated_hue: true
+  # calendar
+    sensor.cal_work_job:
+      icon: mdi:clipboard-check
+    sensor.cal_work_notes:
+      icon: mdi:alert-decagram
+    sensor.cal_work_today:
+      icon: mdi:calendar-question
+    sensor.cal_work_date:
+      icon: mdi:calendar
+    sensor.cal_work_call_time:
+      icon: mdi:calendar-clock
+    sensor.cal_work_location:
+      icon: mdi:map-marker
+    sensor.cal_work_leave_time_driving:
+      icon: mdi:car
+    sensor.cal_work_leave_time_transit:
+      icon: mdi:train
+    sensor.cal_work_leave_time_bike:
+      icon: mdi:bike
+    sensor.driving_to_next_job:
+      icon: mdi:car
+    sensor.bike_to_next_job:
+      icon: mdi:bike
+    sensor.cal_work_bike_distance:
+      icon: mdi:map
+
+    sensor.cal_fb_leave_time_driving:
+      icon: mdi:car
+    sensor.driving_to_next_event:
+      icon: mdi:car
+    sensor.cal_fb_leave_time_transit:
+      icon: mdi:train
+    sensor.cal_fb_leave_time_bike:
+      icon: mdi:bike
+    sensor.bike_to_next_event:
+      icon: mdi:bike
+    sensor.cal_fb_event:
+      icon: mdi:pizza
+    sensor.cal_fb_time:
+      icon: mdi:calendar-clock
+    sensor.cal_fb_today:
+      icon: mdi:calendar-question
+    sensor.cal_fb_location:
+      icon: mdi:map-marker
+    sensor.cal_fb_bike_distance:
+      icon: mdi:map
+    sensor.cal_fb_url:
+      icon: mdi:link-variant
+
+
+
+# Just for Alexa
+    script.everything_off:
+      emulated_hue: true
+      emulated_hue_name: Kill Switch
+    scene.all_lights_on:
+      emulated_hue: true
+      emulated_hue_name: All Lights
+    scene.day_dim_lights:
+      emulated_hue: true
+    scene.evening_bright_lights:
+      emulated_hue: true
+      emulated_hue_name: Evening Lights
+    script.goodnight:
+      emulated_hue: true
+      emulated_hue_name: Goodnight Sequence
+    scene.night_dim_lights:
+      emulated_hue: true
+      emulated_hue_name: Night Lights
+    scene.night_light:
+      emulated_hue: true
+      emulated_hue_name: Red Mode
+    switch.coffeemaker:
+      friendly_name: "Coffee Maker"
+      emulated_hue: true
+      extra_data_template: "{state_detail}"
+#      show_last_changed: true
+      emulated_hue_name: Coffee
+    script.tts_plant_info:
+      friendly_name: "Plant Update"
+      emulated_hue: true

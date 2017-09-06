@@ -1,0 +1,45 @@
+# Dim lights down over 5 minutes
+# Turn on bedroom light
+# Set house state
+goodnight:
+  alias: Goodnight Sequence
+  sequence:
+    # LIGHTS!!!
+    # Turn off switches
+    - service: homeassistant.turn_off
+      entity_id: light.closet, switch.sink, switch.string_lights, switch.office, switch.edison_pendants, switch.kitchen_lights, switch.work_lamp, switch.bathroom_light
+    # Turn off non-milight lights with transitions
+    - service: light.turn_off
+      data:
+        entity_id: light.back_overheads, light.front_overheads
+        transition: 300
+    # Turn off milights by individual bulbs (registers state in HA)
+    - service: light.turn_off
+      data:
+        entity_id: light.dining_floor_lamp, light.entry, light.fridge, light.stove, light.floor_lamp, light.globes, light.office_pendant
+    # Turn on bedroom
+    - service: light.turn_on
+      data:
+        entity_id: light.bedroom
+        brightness: 120
+
+    # Set house mode to sleeping
+    - service: variable.set_variable
+      data:
+        variable: house_state
+        value: "Sleeping"
+
+    # LAST STEP: CLEAN UP MILIGHTS
+    - delay: '00:05:03'
+    # HA does not see these state changes, they go direct to hub
+    - service: script.turn_on
+      entity_id: script.milight_front_off
+    - delay: '00:00:05'
+    - service: script.turn_on
+      entity_id: script.milight_back_off
+    - delay: '00:00:05'
+    - service: script.turn_on
+      entity_id: script.milight_front_off
+    - delay: '00:00:05'
+    - service: script.turn_on
+      entity_id: script.milight_back_off

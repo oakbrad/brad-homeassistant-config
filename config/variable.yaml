@@ -1,0 +1,60 @@
+#
+# HOUSE STATE
+#
+# Possible States:
+#   * SLEEPING
+#   * HOME MORNING
+#   * HOME DAY
+#   * HOME EVENING
+#   * HOME LATE
+#   * WATCHING MOVIE
+#   * AWAY
+#   * AWAY VACATION
+#   * GUEST MODE
+#   * ALARM ACTIVE!
+#
+# TRIGGERED BY:
+#   * automation.movie_started_* - WATCHING MOVIE
+#   * script.alarm_clock - HOME MORNING <12p
+#   * automation.wake_up_non_alarm_day - HOME MORNING <12p
+#   * automation.fitbit_detects_new_sleep - HOME MORNING < 12p
+#   * automation.noon_wake_up_ya_bum - HOME DAY @12p
+#   * automation.morning_to_day_transition - HOME DAY @12p
+#   * automation.welcome_home_day - HOME DAY
+#   * automation.sunset_transition - HOME EVENING
+#   * automation.welcome_home_evening - HOME EVENING
+#   * automation.welcome_home_very_late - HOME LATE
+#   * automation.night_to_late_transition - HOME LATE @12a
+#   * script.goodnight- SLEEPING
+#   * automation.auto_sleep - SLEEPING >830p
+#   * automation.see_ya_later - AWAY
+#   * automation.house_state_to_vacation - VACATION
+#   * automation.house_state_to_guest_mode - GUEST MODE
+#   --- automation/movietime.yaml - Add reset when movie over
+
+  house_state:
+    value: 'Not Initialized'
+    restore: true
+    attributes:
+      icon: mdi:timetable
+      name: "House State"
+
+  last_motion:
+    value: 'unknown'
+    restore: true
+    attributes:
+      icon: mdi:map-marker
+      name: "Last Motion"
+
+  transit_mode:
+    value: 'None'
+    restore: true
+    attributes:
+      icon: mdi:transit-transfer
+      name: "Transit Mode"
+  transit_bike:
+    value: 'None'
+    restore: true
+    attributes:
+      icon: mdi:bike
+      name: "Which Bike?"

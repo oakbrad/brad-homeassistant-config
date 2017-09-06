@@ -1,0 +1,31 @@
+milight_front_off:
+  alias: Milight Front Off
+  sequence:
+    - service: mqtt.publish
+      data:
+        topic: "lights/0x2000/rgbw/0"
+        payload: "{'status':'OFF'}"
+
+milight_front_on:
+  alias: Milight Front On
+  sequence:
+    - service: mqtt.publish
+      data:
+        topic: "lights/0x2000/rgbw/0"
+        payload: "{'status':'ON'}"
+
+milight_back_off:
+  alias: Milight Back Off
+  sequence:
+    - service: mqtt.publish
+      data:
+        topic: "lights/0x8000/rgbw/0"
+        payload: "{'status':'OFF'}"
+
+milight_back_on:
+  alias: Milight Back On
+  sequence:
+    - service: mqtt.publish
+      data:
+        topic: "lights/0x8000/rgbw/0"
+        payload: "{'status':'ON'}"

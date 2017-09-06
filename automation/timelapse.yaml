@@ -1,0 +1,19 @@
+#
+# TRIGGER TIMELAPSE SHELL SCRIPT
+#
+- alias: Timelapse - Record Sunrise
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: "-00:20:00"
+  action:
+    - service: shell_command.triggertimelapse
+
+- alias: Timelapse - Record Sunset
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-00:20:00"
+  action:
+    - service: shell_command.triggertimelapse
+

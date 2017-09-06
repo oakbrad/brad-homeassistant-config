@@ -1,0 +1,771 @@
+#
+#
+# SENSORS!!!!!!!!
+
+#
+# NEXT WORK DAY SENSOR
+# Turn calendar.work into seperate sensors
+#
+- platform: template
+  sensors:
+    cal_work_job:
+      friendly_name: Next Job
+      value_template: "{{ states.calendar.work.attributes.message }}"
+    cal_work_notes:
+        friendly_name: Job Notes
+        value_template: "{{ states.calendar.work.attributes.description }}"
+    cal_work_allday:
+      friendly_name: All Day
+      value_template: "{{ states.calendar.work.attributes.all_day }}"
+    # "Monday 9/4"
+    cal_work_date:
+      friendly_name: Date
+      value_template: "{{ as_timestamp(states.calendar.work.attributes.start_time) | timestamp_custom('%A %-m/%-d') }}"
+    cal_work_today:
+      friendly_name: "Work Today?"
+      value_template: "{{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d') == as_timestamp(states.calendar.work.attributes.start_time) | timestamp_custom('%Y-%m-%d') }}"
+    # Timestamp for Travel Time
+    cal_work_start_time:
+      friendly_name: Start Time
+      value_template: "{{ states.calendar.work.attributes.start_time }}"
+    # "17:52"
+    cal_work_call_time:
+      friendly_name: Call Time
+      value_template: "{{ as_timestamp(states.calendar.work.attributes.start_time) | timestamp_custom('%-H:%M') }}"
+    cal_work_location:
+      friendly_name: Location
+      value_template: "{{ states.calendar.work.attributes.location }}"
+    cal_work_leave_time_transit:
+      value_template: "{{ (as_timestamp(states.calendar.work.attributes.start_time) - states.sensor.transit_to_next_job.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%-H:%M') }}"
+      friendly_name: Leave Time
+    cal_work_leave_time_driving:
+      value_template: "{{ (as_timestamp(states.calendar.work.attributes.start_time) - states.sensor.driving_to_next_job.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%-H:%M') }}"
+      friendly_name: Leave Time
+    cal_work_leave_time_bike:
+      value_template: "{{ (as_timestamp(states.calendar.work.attributes.start_time) - states.sensor.bike_to_next_job.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%-H:%M') }}"
+      friendly_name: Leave Time
+    cal_work_bike_distance:
+      value_template: "{{ states.sensor.bike_to_next_job.attributes.distance }}"
+# Transit to Next Job
+- platform: google_travel_time
+  name: Transit to Next Job
+  api_key: !secret google_key
+  origin: zone.home
+  destination: sensor.cal_work_location
+  options:
+#    arrival_time: sensor.cal_work_start_time
+    mode: transit
+# Driving to Next Job
+- platform: google_travel_time
+  name: Driving to Next Job
+  api_key: !secret google_key
+  origin: zone.home
+  destination: sensor.cal_work_location
+  options:
+    arrival_time: sensor.cal_work_start_time
+    mode: driving
+# Bike to Next Job
+- platform: google_travel_time
+  name: Bike to Next Job
+  api_key: !secret google_key
+  origin: device_tracker.brad
+  destination: sensor.cal_work_location
+  options:
+    arrival_time: sensor.cal_work_start_time
+    mode: bicycling
+
+#
+# Next FB Event
+#
+# Get info from calendar.fb_events
+# Format into friendly sensors for:
+# TTS morning
+# Morning notifications
+# Notification before event w/ link
+#
+- platform: template
+  sensors:
+    cal_fb_event:
+      friendly_name: Next Event
+      value_template: "{{ states.calendar.fb_events.attributes.message }}"
+    cal_fb_description:
+        friendly_name: Event Description
+        value_template: "{{ states.calendar.fb_events.attributes.description }}"
+    cal_fb_location:
+      friendly_name: Event Location
+      value_template: "{{ states.calendar.fb_events.attributes.location }}"
+    # "6:30PM"
+    cal_fb_time:
+      friendly_name: Event Time
+      value_template: "{{ as_timestamp(states.calendar.fb_events.attributes.start_time) | timestamp_custom('%l:%M%p') }}"
+    cal_fb_url:
+      friendly_name: Next Event URL
+      value_template: " {% set length = states.calendar.fb_events.attributes.description.split(' ') | length %}{% set url_1 = states.calendar.fb_events.attributes.description.split(' ')[length-1] %}{% set url = url_1.split('https')[1] %}{% set prefix = 'https' %}{{ [prefix, url] | join('') }}"
+    cal_fb_today:
+      friendly_name: "Event Today?"
+      value_template: "{{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d') == as_timestamp(states.calendar.fb_events.attributes.start_time) | timestamp_custom('%Y-%m-%d') }}"
+    cal_fb_leave_time_transit:
+      value_template: "{{ (as_timestamp(states.calendar.fb_events.attributes.start_time) - states.sensor.transit_to_next_event.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%l:%M%p') }}"
+      friendly_name: Leave Time
+    cal_fb_leave_time_driving:
+      value_template: "{{ (as_timestamp(states.calendar.fb_events.attributes.start_time) - states.sensor.driving_to_next_event.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%l:%M%p') }}"
+      friendly_name: Leave Time
+    cal_fb_leave_time_bike:
+      value_template: "{{ (as_timestamp(states.calendar.fb_events.attributes.start_time) - states.sensor.bike_to_next_event.attributes.duration.split(' ')[0] | int *60 ) | timestamp_custom('%l:%M%p') }}"
+      friendly_name: Leave Time
+    cal_fb_bike_distance:
+      value_template: "{{ states.sensor.bike_to_next_event.attributes.distance }}"
+# Transit to Next Event
+- platform: google_travel_time
+  name: Transit to Next Event
+  api_key: !secret google_key
+  origin: device_tracker.brad
+  destination: sensor.cal_fb_location
+  options:
+    arrival_time: sensor.cal_fb_start_time
+    mode: transit
+# Driving to Next Event
+- platform: google_travel_time
+  name: Driving to Next Event
+  api_key: !secret google_key
+  origin: device_tracker.brad
+  destination: sensor.cal_fb_location
+  options:
+    arrival_time: sensor.cal_fb_start_time
+    mode: driving
+# Bike to Next Event
+- platform: google_travel_time
+  name: Bike to Next Event
+  api_key: !secret google_key
+  origin: device_tracker.brad
+  destination: sensor.cal_fb_location
+  options:
+    arrival_time: sensor.cal_fb_start_time
+    mode: bicycling
+
+
+# GOOGLE MAX REQUESTS 2500/DAY
+# EVERY 5M / 24H = 8 SENSORS MAX
+# CURRENTLY AT 8!!!
+
+- platform: google_travel_time
+  name: Current Location to Home
+  api_key: !secret google_key
+  origin: device_tracker.brad
+  destination: zone.home
+  options:
+    mode: transit
+- platform: google_travel_time
+  name: Home to SF
+  api_key: !secret google_key
+  origin: zone.home
+  destination: San Francisco, CA
+  options:
+    mode: driving
+#- platform: google_travel_time
+#  name: Current Location to Studio
+#  api_key: !secret google_key
+#  origin: device_tracker.brad
+#  destination: zone.studio
+#- platform: google_travel_time
+#  name: Home to 16th Mission BART
+#  api_key: !secret google_key
+#  origin: zone.home
+#  destination: 16th Street Mission BART, San Francisco, CA
+#  options:
+#    mode: transit
+#- platform: google_travel_time
+#  name: Home to Richmond BART
+#  api_key: !secret google_key
+#  origin: zone.home
+#  destination: Richmond BART, Richmond, CA
+#  options:
+#    mode: transit
+
+
+
+
+#
+# BRUH NODE
+#
+- platform: mqtt
+  state_topic: "BruhNode/LivingRoom"
+  name: "Living Room Humidity"
+  unit_of_measurement: "%"
+  value_template: '{{ value_json.humidity | round(1) }}'
+
+- platform: mqtt
+  state_topic: "BruhNode/LivingRoom"
+  name: "Living Room Light Intensity"
+  ##This sensor is not calibrated to actual LUX. Rather, this a map of the input voltage ranging from 0 - 1023.
+  unit_of_measurement: "LUX"
+  value_template: '{{ value_json.ldr }}'
+
+- platform: mqtt
+  state_topic: "BruhNode/LivingRoom"
+  name: "Living Room Temperature"
+  unit_of_measurement: "°F"
+  value_template: '{{ value_json.temperature | round(1) }}'
+
+- platform: mqtt
+  state_topic: "BruhNode/LivingRoom"
+  name: "Living Room Heat Index"
+  unit_of_measurement: "°F"
+  value_template: '{{ value_json.heatIndex | round(1) }}'
+
+
+#
+# MIN / MAX
+#
+- platform: min_max
+  entity_ids:
+    - sensor.kitchen_pothos_temperature
+    - sensor.kitchen_temperature
+    - sensor.giant_pothos_temperature
+    - sensor.hanging_red_pothos_temperature
+    - sensor.window_air_temp
+    - sensor.giant_philodrendon_temperature
+    - sensor.hanging_spider_plant_temperature
+    - sensor.palm_temperature
+    - sensor.projector_pothos_temperature
+    - sensor.rubber_plant_temperature
+    - sensor.small_philodendron_temperature
+    - sensor.window_spider_plant_temperature
+    - sensor.living_room_temperature
+  type: mean
+  name: indoor_mean_temp
+  round_digits: 0
+
+- platform: min_max
+  entity_ids:
+    - sensor.humidity
+    - sensor.living_room_humidity
+    - sensor.kitchen_humidity
+  type: mean
+  name: indoor_mean_humidity
+
+#
+# Better Templates for Tracking Critical Smart Home Devices
+#
+- platform: template
+  sensors:
+    bradlaptop_online:
+      value_template: "{% if states.device_tracker.bradlaptop %}
+        {% if is_state('device_tracker.bradlaptop', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: "Brad's Laptop"
+- platform: template
+  sensors:
+    laserprinter_online:
+      value_template: "{% if states.device_tracker.laserprinter %}
+        {% if is_state('device_tracker.laserprinter', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: 'Laser Printer'
+- platform: template
+  sensors:
+    ikeatradfri_online:
+      value_template: "{% if states.device_tracker.ikeatradfri %}
+        {% if is_state('device_tracker.ikeatradfri', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: 'Ikea Tradfri Hub'
+- platform: template
+  sensors:
+    synology_online:
+      value_template: "{% if states.device_tracker.synology %}
+        {% if is_state('device_tracker.synology', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: 'Synology NAS'
+- platform: template
+  sensors:
+    frontdoorcam_online:
+      value_template: "{% if states.device_tracker.frontdoorcam %}
+        {% if is_state('device_tracker.frontdoorcam', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: 'Front Door Camera'
+- platform: template
+  sensors:
+    espmilight_online:
+      value_template: "{% if states.device_tracker.espmilight %}
+        {% if is_state('device_tracker.espmilight', 'home') %}
+          Online
+        {% else %}
+          Offline
+        {% endif %}
+        {% else %}
+          Unknown
+        {% endif %}"
+      friendly_name: 'Milight Hub'
+
+#
+# MIFLORA!!
+#
+
+- platform: miflora
+  mac: "C4:7C:8D:63:3A:5D"
+  name: Giant Philodendron
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:63:3A:4D"
+  name: Rubber Plant
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:60:E5:11"
+  name: Palm
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:2A:51"
+  name: Projector Pothos
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:71:49"
+  name: Hanging Spider Plant
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:71:68"
+  name: Giant Pothos
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:7B:7D"
+  name: Window Spider Plant
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:78:5B"
+  name: Small Philodendron
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:73:E8"
+  name: Hanging Red Pothos
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+- platform: miflora
+  mac: "C4:7C:8D:62:73:BD"
+  name: Kitchen Pothos
+  force_update: true
+  median: 1
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - battery
+    - conductivity
+
+#
+# ESP8266 NODES
+#
+# Motion Sensors are in binary_sensors.yaml
+
+#
+# KITCHEN NODE
+- platform: mqtt
+  state_topic: "KitchenNode/Air/Smoke"
+  qos: 0
+  name: "Kitchen Smoke"
+  unit_of_measurement: "ppm"
+- platform: mqtt
+  state_topic: "KitchenNode/Air/Temperature"
+  qos: 0
+  name: "Kitchen Temperature"
+  unit_of_measurement: "°F"
+- platform: mqtt
+  state_topic: "KitchenNode/Air/Humidity"
+  qos: 0
+  name: "Kitchen Humidity"
+  unit_of_measurement: "%"
+
+# AQUARIUM NODE
+# TEMP
+- platform: mqtt
+  state_topic: "AquariumNode/Air/Temperature"
+  name: "Window Air Temp"
+  qos: 0
+  unit_of_measurement: "°F"
+- platform: mqtt
+  state_topic: "AquariumNode/Air/Humidity"
+  name: "Humidity"
+  qos: 0
+  unit_of_measurement: "%"
+- platform: mqtt
+  state_topic: "AquariumNode/Water/Temperature"
+  name: "Water Temperature"
+  qos: 0
+  unit_of_measurement: "°F"
+- platform: mqtt
+  state_topic: "AquariumNode/Air/Pressure"
+  name: "Air Pressure"
+  qos: 0
+  unit_of_measurement: "inHg"
+- platform: mqtt
+  state_topic: "AquariumNode/Plant/Moisture"
+  name: "Window Container Moisture"
+  qos: 0
+  unit_of_measurement: "%"
+
+#
+# JLS FERRY
+#
+- platform: gtfs
+  name: "Ferry to SF"
+  origin: 12030043
+  destination: 890001
+  # How long to bike to terminal
+  #offset: 8
+  data: sfbayferry.zip
+
+# Make a sensor for Arrival time
+- platform: template
+  sensors:
+    ferry_to_sf_arrival:
+      value_template: "{{ as_timestamp(states.sensor.ferry_to_sf.attributes['Destination Stop Arrival Time']) | timestamp_custom('%k:%M') }}"
+      friendly_name: "SF Ferry Arrival"
+
+
+#
+#
+# WEATHER
+#
+
+- platform: darksky
+  api_key: !secret darksky_api
+  forecast:
+    - 1
+  monitored_conditions:
+    - icon
+    - summary
+    - hourly_summary
+    - daily_summary
+    - wind_speed
+    - wind_bearing
+    - precip_intensity
+    - precip_probability
+    - temperature
+    - cloud_cover
+    - temperature_max
+    - temperature_min
+- platform: yr
+  monitored_conditions:
+    - fog
+    - symbol
+
+# Convert the Wind Direction from degrees to cardinal
+- platform: template
+  sensors:
+    friendly_wind_direction:
+      friendly_name: 'Wind Direction'
+      value_template: >-
+        {%if states.sensor.dark_sky_wind_bearing.state | float<=11 %}N
+        {% elif states.sensor.dark_sky_wind_bearing.state | float>348 %}N
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=34 | float>11 %}NNE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=56 | float>34 %}NE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=79 | float>56 %}ENE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=101 | float>79 %}E
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=124 | float>101 %}ESE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=146 | float>124 %}SE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=169 | float>146 %}SSE
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=191 | float>169 %}S
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=214 | float>191 %}SSW
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=236 | float>214 %}SW
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=259 | float>236 %}WSW
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=281 | float>259 %}W
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=304 | float>281 %}WNW
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=326 | float>304 %}NW
+        {% elif states.sensor.dark_sky_wind_bearing.state | float<=348 | float>326 %}NNW
+        {%- endif %}
+- platform: template
+  sensors:
+    friendly_wind_direction_forecast:
+      friendly_name: 'Wind Forecast'
+      value_template: >-
+        {%if states.sensor.dark_sky_wind_bearing_1.state | float<=11 %}N
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float>348 %}N
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=34 | float>11 %}NNE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=56 | float>34 %}NE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=79 | float>56 %}ENE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=101 | float>79 %}E
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=124 | float>101 %}ESE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=146 | float>124 %}SE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=169 | float>146 %}SSE
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=191 | float>169 %}S
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=214 | float>191 %}SSW
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=236 | float>214 %}SW
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=259 | float>236 %}WSW
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=281 | float>259 %}W
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=304 | float>281 %}WNW
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=326 | float>304 %}NW
+        {% elif states.sensor.dark_sky_wind_bearing_1.state | float<=348 | float>326 %}NNW
+        {%- endif %}
+
+# Sunset / Sunrise / Solar Elevation
+- platform: template
+  sensors:
+    sunset_time:
+      value_template: "{% set timestamp = as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom('%I:%M') %} {{ timestamp.lstrip('0') }}"
+      friendly_name: Sunset
+      unit_of_measurement: PM
+    sunrise_time:
+      value_template: "{% set timestamp = as_timestamp(states.sun.sun.attributes.next_rising) | timestamp_custom('%I:%M') %} {{ timestamp.lstrip('0') }}"
+      friendly_name: Sunrise
+      unit_of_measurement: AM
+    solar_angle:
+      value_template: "{{ states.sun.sun.attributes.elevation }}"
+      friendly_name: Solar Angle
+      unit_of_measurement: degrees
+
+
+- platform: time_date
+  display_options:
+    - 'time'
+    - 'date'
+    - 'date_time'
+    - 'time_date'
+    - 'time_utc'
+
+# iPhone Battery
+- platform: template
+  sensors:
+    battery_iphone:
+      unit_of_measurement: '%'
+      value_template: >
+          {%- if states.device_tracker.brad_ios.attributes.battery %}
+              {{ states.device_tracker.brad_ios.attributes.battery|round }}
+          {% else %}
+              {{ states.sensor.battery_iphone.state }}
+          {%- endif %}
+      icon_template: '{%- if is_state("sensor.battery_iphone", "unknown") %}mdi:battery-unknown{%- elif is_state_attr("sensor.bradphone_battery_state_2", "battery_statte", "Charging") %}mdi:battery-charging{%- elif  states.device_tracker.brad_ios.attributes.battery <= 5 %}mdi:battery-outline{%- elif states.device_tracker.brad_ios.attributes.battery >= 95 %}mdi:battery{% else %}mdi:battery-{{(states.device_tracker.brad_ios.attributes.battery|float / 10)|round*10}}{%- endif %}'
+
+# For Alarm Clock
+- platform: template
+  sensors:
+    alarm_time:
+      friendly_name: 'Time'
+      value_template: '{{ "%0.02d:%0.02d" | format(states("input_slider.alarmhour") | int, states("input_slider.alarmminutes") | int) }}'
+
+# Coffee Maker State Sensor
+- platform: template
+  sensors:
+    coffeemaker:
+      friendly_name: 'Coffee Status'
+      value_template: '{{ states.switch.coffeemaker.attributes.state_detail }}'
+      icon_template: mdi:coffee-outline
+
+# Playing on Pi
+- platform: template
+  sensors:
+    nowplaying_pi:
+      friendly_name: ' '
+      value_template: >-
+          {%- if is_state("media_player.pi", "off") %}
+              Off
+          {% elif is_state("media_player.pi", "paused") %}
+              Paused
+          {% elif is_state("media_player.pi", "playing") %}
+              {{ states.media_player.pi.attributes.media_title }}
+          {% else  %}
+              Failed
+          {%- endif %}
+      icon_template: >-
+          {%- if is_state("media_player.pi", "off") %}
+              mdi:stop-circle-outline
+          {% elif is_state("media_player.pi", "paused") %}
+              mdi:pause-circle-outline
+          {% elif is_state("media_player.pi", "playing") %}
+              mdi:play-circle-outline
+          {% else  %}
+              mdi:volume-off
+          {%- endif %}
+
+# Playing on Volumio
+- platform: template
+  sensors:
+    nowplaying_volumio:
+      friendly_name: ' '
+      value_template: >-
+          {%- if is_state("media_player.volumio", "off") %}
+              Off
+          {% elif is_state("media_player.volumio", "paused") %}
+              Paused
+          {% elif is_state("media_player.volumio", "idle") %}
+              mdi:stop-circle-outline
+          {% elif is_state("media_player.volumio", "playing") %}
+              {{ states.media_player.volumio.attributes.media_artist }} - {{ states.media_player.volumio.attributes.media_title }}
+          {% else  %}
+              Failed
+          {%- endif %}
+      icon_template: >-
+          {%- if is_state("media_player.volumio", "off") %}
+              mdi:stop-circle-outline
+          {% elif is_state("media_player.volumio", "idle") %}
+              mdi:stop-circle-outline
+          {% elif is_state("media_player.volumio", "paused") %}
+              mdi:pause-circle-outline
+          {% elif is_state("media_player.volumio", "playing") %}
+              mdi:play-circle-outline
+          {% else  %}
+              mdi:volume-off
+          {%- endif %}
+
+
+#
+# FILEZ FILEZ FILEZ
+#
+- platform: transmission
+  host: !secret host_synology
+  username: !secret transmission_user
+  password: !secret transmission_pass
+  monitored_variables:
+    - 'current_status'
+    - 'download_speed'
+    - 'upload_speed'
+# Reformat the speed sensors to be in Kbp/s
+- platform: template
+  sensors:
+    transmission_down_speed_kbps:
+      value_template: '{{ states.sensor.transmission_down_speed.state | multiply(1024) }}'
+      friendly_name: 'Transmission Down Speed'
+      unit_of_measurement: 'kB/s'
+    transmission_up_speed_kbps:
+      value_template: '{{ states.sensor.transmission_up_speed.state | multiply(1024) }}'
+      friendly_name: 'Transmission Up Speed'
+      unit_of_measurement: 'kB/s'
+# MORE FILEZ
+- platform: sabnzbd
+  host: !secret host_synology
+  api_key: d79b4a1a341893ea1236e4a53c971c4c
+  monitored_variables:
+    - 'current_status'
+    - 'speed'
+    - 'queue_size'
+    - 'queue_remaining'
+    - 'disk_size' # Use these for stats on Synology
+    - 'disk_free' # Yep
+# Rewrite disk_size/disk_free for Synology (in TB)
+- platform: template
+  sensors:
+      synology_storage:
+        value_template: '{{ states.sensor.sabnzbd_disk.state | multiply(0.001024) | round(2)  }}'
+        friendly_name: 'Synology Disk Size'
+        unit_of_measurement: 'TB'
+      synology_storage_free:
+        value_template: '{{ states.sensor.sabnzbd_disk_free.state | multiply(0.001024) | round(2)  }}'
+        friendly_name: 'Synology Free Space'
+        unit_of_measurement: 'TB'
+
+#
+# SYSTEM SENSORS
+#
+- platform: systemmonitor
+  resources:
+    - type: disk_use_percent
+      arg: /
+    - type: disk_free
+      arg: /
+    - type: memory_use_percent
+    - type: processor_use
+    - type: since_last_boot
+
+- platform: moon
+
+#
+# Friendly Date
+
+- platform: template
+  sensors:
+    friendly_date:
+      # Thursday June 10th, 2017
+      friendly_name: "Today's Date"
+      value_template: "{{ now().strftime('%A %B %e, %Y') }}"
+    friendly_date_day:
+      # Thu
+      friendly_name: "Today's Day"
+      value_template: "{{ now().strftime('%a') }}"

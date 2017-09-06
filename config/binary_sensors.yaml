@@ -1,0 +1,125 @@
+#
+# Binary Sensor for Monoprice door sensor
+- platform: template
+  sensors:
+    front_door:
+      value_template: '{% if is_state("sensor.mono_frontdoor_alarm_level", "0") %}false{% else %}true{% endif %}'
+      device_class: motion
+      friendly_name: 'Front Door'
+      entity_id: sensor.mono_frontdoor_alarm_level
+
+#
+# META MOTION SENSORS
+#
+
+- platform: template
+  sensors:
+    dining_motion_meta:
+      friendly_name: 'Dining Motion'
+      device_class: motion
+      value_template: >-
+        {%- if is_state("binary_sensor.dining_motion", "on")
+        or is_state("binary_sensor.dining_motion_2", "on")
+          -%}
+        True
+        {%- else -%}
+        False
+        {%- endif %}
+      entity_id:
+        - binary_sensor.dining_motion
+        - binary_sensor.dining_motion_2
+    kitchen_motion_meta:
+      friendly_name: 'Kitchen Motion'
+      device_class: motion
+      value_template: >-
+        {%- if is_state("binary_sensor.kitchen_motion", "on")
+        or is_state("binary_sensor.fridge_motion", "on")
+        or is_state("binary_sensor.crawl_space_door", "on")
+          -%}
+        True
+        {%- else -%}
+        False
+        {%- endif %}
+    livingroom_motion_meta:
+      friendly_name: 'Living Room Motion'
+      device_class: motion
+      value_template: >-
+        {%- if is_state("binary_sensor.aquarium_motion", "on")
+        or is_state("binary_sensor.living_pi_motion", "on")
+          -%}
+        True
+        {%- else -%}
+        False
+        {%- endif %}
+    entry_motion_meta:
+      friendly_name: 'Entry Motion'
+      device_class: motion
+      value_template: >-
+        {%- if is_state("binary_sensor.front_door", "on")
+        or is_state("binary_sensor.entry_motion", "on")
+          -%}
+        True
+        {%- else -%}
+        False
+        {%- endif %}
+
+#
+# Motion Sensor via RPI GPIO
+#
+
+- platform: mqtt
+  state_topic: "PiNode/Motion/LivingRoom/Switch"
+  device_class: motion
+  payload_on: "1"
+  payload_off: "0"
+  name: "Living Pi Motion"
+- platform: mqtt
+  state_topic: "PiNode/Motion/Dining/Switch"
+  device_class: motion
+  payload_on: "1"
+  payload_off: "0"
+  name: "Dining Motion"
+
+#
+# MOTION SENSORS VIA NODES
+#
+
+- platform: mqtt
+  state_topic: "BruhNode/LivingRoom"
+  device_class: motion
+  value_template: '{{ value_json.motion }}'
+  payload_on: 'motion detected'
+  payload_off: 'standby'
+  name: "Dining Motion 2"
+
+- platform: mqtt
+  state_topic: "ClosetNode/Motion/Switch"
+  device_class: motion
+  payload_on: "1"
+  payload_off: "0"
+  name: "Closet Motion"
+
+- platform: mqtt
+  state_topic: "KitchenNode/Motion/Switch"
+  device_class: motion
+  payload_on: "1"
+  payload_off: "0"
+  name: "Kitchen Motion"
+
+#
+# DOORS / WINDOWS
+#
+- platform: mqtt
+  state_topic: "KitchenNode/Door/Switch"
+  device_class: opening
+  payload_on: "1"
+  payload_off: "0"
+  name: "Crawl Space Door"
+
+
+- platform: mqtt
+  state_topic: "AquariumNode/Window/Switch"
+  device_class: opening
+  payload_on: "1"
+  payload_off: "0"
+  name: "Left Window"

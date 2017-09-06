@@ -1,0 +1,19 @@
+#
+# Related to climate control
+#
+
+- alias: 'Update Average Indoor Temperature'
+  trigger:
+    - platform: state
+      entity_id: sensor.entry_temperature, sensor.kitchen_pothos_temperature, sensor.kitchen_temperature, sensor.giant_pothos_temperature, sensor.hanging_red_pothos_temperature, sensor.window_air_temp, sensor.giant_philodrendon_temperature, sensor.hanging_spider_plant_temperature, sensor.palm_temperature, sensor.projector_pothos_temperature, sensor.rubber_plant_temperature, sensor.small_philodendron_temperature, sensor.window_spider_plant_temperature
+  action:
+    - service: automation.turn_off
+      entity_id: automation.update_average_indoor_temperature
+
+    - service: python_script.average_temp 
+
+    # Rate limit
+    - delay:
+        minutes: 5
+    - service: automation.turn_on
+      entity_id: automation.update_average_indoor_temperature
