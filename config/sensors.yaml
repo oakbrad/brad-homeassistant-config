@@ -538,30 +538,30 @@
     - fog
     - symbol
 
-# Convert the Wind Direction from degrees to cardinal
-- platform: template
-  sensors:
-    friendly_wind_direction:
-      friendly_name: 'Wind Direction'
-      value_template: >-
-        {%if states.sensor.dark_sky_wind_bearing.state | float<=11 %}N
-        {% elif states.sensor.dark_sky_wind_bearing.state | float>348 %}N
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=34 | float>11 %}NNE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=56 | float>34 %}NE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=79 | float>56 %}ENE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=101 | float>79 %}E
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=124 | float>101 %}ESE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=146 | float>124 %}SE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=169 | float>146 %}SSE
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=191 | float>169 %}S
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=214 | float>191 %}SSW
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=236 | float>214 %}SW
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=259 | float>236 %}WSW
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=281 | float>259 %}W
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=304 | float>281 %}WNW
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=326 | float>304 %}NW
-        {% elif states.sensor.dark_sky_wind_bearing.state | float<=348 | float>326 %}NNW
-        {%- endif %}
+# # Convert the Wind Direction from degrees to cardinal
+  - platform: template
+    sensors:
+      friendly_wind_direction:
+        friendly_name: 'Wind Direction'
+        value_template: >-
+          {%if state_attr('weather.dark_sky', 'wind_bearing') | float<=11 %}N
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float>348 %}N
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=34 | float>11 %}NNE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=56 | float>34 %}NE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=79 | float>56 %}ENE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=101 | float>79 %}E
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=124 | float>101 %}ESE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=146 | float>124 %}SE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=169 | float>146 %}SSE
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=191 | float>169 %}S
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=214 | float>191 %}SSW
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=236 | float>214 %}SW
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=259 | float>236 %}WSW
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=281 | float>259 %}W
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=304 | float>281 %}WNW
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=326 | float>304 %}NW
+          {% elif state_attr('weather.dark_sky', 'wind_bearing') | float<=348 | float>326 %}NNW
+          {%- endif %}
 - platform: template
   sensors:
     friendly_wind_direction_forecast:
